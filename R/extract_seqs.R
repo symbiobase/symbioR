@@ -5,8 +5,8 @@
 #' @param clade filter by single "C" or multiple clades c("C", "D") to filter sequences by
 #' @param cutoff Set threshold to remove samples if less than the cutoff (defaults to 1000)
 #' @param silent defaults to TRUE, if FALSE then prints a list of removed sample names
-#'
-#' @returns A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
+#' @export
+#' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 #' @examples
 #' ## not run:
 #' # tmp <- extract_seqs(folder="20220919T102058_esampayo", type="absolute", clade=c("C", "D"))
@@ -37,7 +37,7 @@ extract_seqs <- function(folder, type = "relative", clade = LETTERS[1:10], cutof
 
   if (silent==FALSE){
     cat("Excluded samples \n")
-    cat(walk(list(unique(rownames(excluded_samples))), ~print(.x)))
+    cat(paste0(" - ", unique(rownames(excluded_samples)), collapse="\n"), " \n")
   }
 
   relative <- read.delim(paste0(folder, "/", file_list)) %>%
