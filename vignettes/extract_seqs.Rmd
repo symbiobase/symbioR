@@ -144,7 +144,7 @@ tmp <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo"
 round(tmp[1:5,1:10],3) # show first 5 cols, 10 rows, round to 3 decimal places
 ```
 
-## Plot stacked bar graph of sequences (ggplot)
+## example: Plot stacked bar graph of sequences (ggplot)
 
 
 To extract in a long format (like `pivot-longer`), use `extract_seqs_long`. 
@@ -162,4 +162,47 @@ ggplot() + theme_bw() +
 
 ```
 
-## Plot stacked bar graph of sequences (plotly)
+## example: plot dendrogram with KM clusters
+
+Second example: use `extract_seqs` with vegan to get dendrogram and clusters.
+
+```{r, fig.width=8, fig.height=7}
+cluster.C <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", cutoff=100) 
+
+library(vegan)
+library(tibble)
+
+cluster.C.dist <- vegdist(cluster.C, method ="bray")
+cluster.C.km <- cascadeKM(cluster.C.dist, 1, 10, iter = 5000)
+
+cluster.C.km.grps <- as.data.frame(cluster.C.km[["partition"]]) %>% 
+  rownames_to_column(var="sample.ID")
+
+```
+
+```{r, fig.width=10, fig.height=5}
+library(dendextend)
+
+cluster.C.km.grps <- as.data.frame(cluster.C.km[["partition"]]) %>% 
+  rownames_to_column(var="sample.ID")
+
+cluster.C.dend  <- as.dendrogram(hclust(cluster.C.dist, method = "complete")) %>% color_labels(., k = 6)
+plot(cluster.C.dend, main="Postmed C sequences >100 seqs", ylab="Bray Curtis")
+
+```
+
+Now tune the noise with cutoff:
+
+```{r, fig.width=10, fig.height=5}
+cluster.C <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", cutoff=10000) 
+
+cluster.C.dist <- vegdist(cluster.C, method ="bray")
+cluster.C.km <- cascadeKM(cluster.C.dist, 1, 10, iter = 5000)
+
+cluster.C.km.grps <- as.data.frame(cluster.C.km[["partition"]]) %>% 
+  rownames_to_column(var="sample.ID")
+
+cluster.C.dend <- as.dendrogram(hclust(cluster.C.dist, method = "complete")) %>% color_labels(., k = 6)
+plot(cluster.C.dend, main="Postmed C sequences >10,000 seqs", ylab="Bray Curtis")
+
+```

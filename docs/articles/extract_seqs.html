@@ -261,7 +261,7 @@ manually will lower this threshold to 100 seqs</p>
 </div>
 </div>
 <div class="section level3">
-<h3 id="plot-stacked-bar-graph-of-sequences-ggplot">Plot stacked bar graph of sequences (ggplot)<a class="anchor" aria-label="anchor" href="#plot-stacked-bar-graph-of-sequences-ggplot"></a>
+<h3 id="example-plot-stacked-bar-graph-of-sequences-ggplot">example: Plot stacked bar graph of sequences (ggplot)<a class="anchor" aria-label="anchor" href="#example-plot-stacked-bar-graph-of-sequences-ggplot"></a>
 </h3>
 <p>To extract in a long format (like <code>pivot-longer</code>), use
 <code>extract_seqs_long</code>. It’s identical to
@@ -279,8 +279,76 @@ format.</p>
 <p><img src="extract_seqs_files/figure-html/unnamed-chunk-9-1.png" width="960"></p>
 </div>
 <div class="section level3">
-<h3 id="plot-stacked-bar-graph-of-sequences-plotly">Plot stacked bar graph of sequences (plotly)<a class="anchor" aria-label="anchor" href="#plot-stacked-bar-graph-of-sequences-plotly"></a>
+<h3 id="example-plot-dendrogram-with-km-clusters">example: plot dendrogram with KM clusters<a class="anchor" aria-label="anchor" href="#example-plot-dendrogram-with-km-clusters"></a>
 </h3>
+<p>Second example: use <code>extract_seqs</code> with vegan to get
+dendrogram and clusters.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cluster.C</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, clade<span class="op">=</span><span class="st">"C"</span>, cutoff<span class="op">=</span><span class="fl">100</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/vegandevs/vegan" class="external-link">vegan</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: permute</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'permute'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:devtools':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     check</span></span>
+<span><span class="co">#&gt; Loading required package: lattice</span></span>
+<span><span class="co">#&gt; This is vegan 2.6-4</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cluster.C.dist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/vegdist.html" class="external-link">vegdist</a></span><span class="op">(</span><span class="va">cluster.C</span>, method <span class="op">=</span><span class="st">"bray"</span><span class="op">)</span></span>
+<span><span class="va">cluster.C.km</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/cascadeKM.html" class="external-link">cascadeKM</a></span><span class="op">(</span><span class="va">cluster.C.dist</span>, <span class="fl">1</span>, <span class="fl">10</span>, iter <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cluster.C.km.grps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">cluster.C.km</span><span class="op">[[</span><span class="st">"partition"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span>var<span class="op">=</span><span class="st">"sample.ID"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://talgalili.github.io/dendextend/" class="external-link">dendextend</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Registered S3 method overwritten by 'dendextend':</span></span>
+<span><span class="co">#&gt;   method     from </span></span>
+<span><span class="co">#&gt;   rev.hclust vegan</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ---------------------</span></span>
+<span><span class="co">#&gt; Welcome to dendextend version 1.17.1</span></span>
+<span><span class="co">#&gt; Type citation('dendextend') for how to cite the package.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Type browseVignettes(package = 'dendextend') for the package vignette.</span></span>
+<span><span class="co">#&gt; The github page is: https://github.com/talgalili/dendextend/</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Suggestions and bug-reports can be submitted at: https://github.com/talgalili/dendextend/issues</span></span>
+<span><span class="co">#&gt; You may ask questions at stackoverflow, use the r and dendextend tags: </span></span>
+<span><span class="co">#&gt;   https://stackoverflow.com/questions/tagged/dendextend</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  To suppress this message use:  suppressPackageStartupMessages(library(dendextend))</span></span>
+<span><span class="co">#&gt; ---------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dendextend'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:permute':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     shuffle</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     cutree</span></span>
+<span></span>
+<span><span class="va">cluster.C.km.grps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">cluster.C.km</span><span class="op">[[</span><span class="st">"partition"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span>var<span class="op">=</span><span class="st">"sample.ID"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cluster.C.dend</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/dendrogram.html" class="external-link">as.dendrogram</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a></span><span class="op">(</span><span class="va">cluster.C.dist</span>, method <span class="op">=</span> <span class="st">"complete"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="http://talgalili.github.io/dendextend/reference/color_labels.html" class="external-link">color_labels</a></span><span class="op">(</span><span class="va">.</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cluster.C.dend</span>, main<span class="op">=</span><span class="st">"Postmed C sequences &gt;100 seqs"</span>, ylab<span class="op">=</span><span class="st">"Bray Curtis"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="extract_seqs_files/figure-html/unnamed-chunk-11-1.png" width="960"></p>
+<p>Now tune the noise with cutoff:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cluster.C</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, clade<span class="op">=</span><span class="st">"C"</span>, cutoff<span class="op">=</span><span class="fl">10000</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="va">cluster.C.dist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/vegdist.html" class="external-link">vegdist</a></span><span class="op">(</span><span class="va">cluster.C</span>, method <span class="op">=</span><span class="st">"bray"</span><span class="op">)</span></span>
+<span><span class="va">cluster.C.km</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/cascadeKM.html" class="external-link">cascadeKM</a></span><span class="op">(</span><span class="va">cluster.C.dist</span>, <span class="fl">1</span>, <span class="fl">10</span>, iter <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cluster.C.km.grps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">cluster.C.km</span><span class="op">[[</span><span class="st">"partition"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span>var<span class="op">=</span><span class="st">"sample.ID"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cluster.C.dend</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/dendrogram.html" class="external-link">as.dendrogram</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a></span><span class="op">(</span><span class="va">cluster.C.dist</span>, method <span class="op">=</span> <span class="st">"complete"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="http://talgalili.github.io/dendextend/reference/color_labels.html" class="external-link">color_labels</a></span><span class="op">(</span><span class="va">.</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cluster.C.dend</span>, main<span class="op">=</span><span class="st">"Postmed C sequences &gt;10,000 seqs"</span>, ylab<span class="op">=</span><span class="st">"Bray Curtis"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="extract_seqs_files/figure-html/unnamed-chunk-12-1.png" width="960"></p>
 </div>
 </div>
   </div>
