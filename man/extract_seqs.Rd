@@ -30,7 +30,7 @@ A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or ab
 Function to extract sequences from symportal output
 }
 \examples{
-## not run:
-# tmp <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="absolute", clade=c("C", "D"))
-# tmp2 <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", cutoff=100)
+
+#tmp <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="absolute", clade=c("C", "D"))
+#tmp2 <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", cutoff=100)
 }

@@ -2,7 +2,7 @@
 title: "extract seqs"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{extract_seqs}
+  %\VignetteIndexEntry{extract seqs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

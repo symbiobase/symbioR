@@ -12,4 +12,6 @@ URL: https://marine-ecologist.github.io/symportalfunctions/
 Suggests: 
     knitr,
     rmarkdown
+Imports:
+    magrittr
 VignetteBuilder: knitr
