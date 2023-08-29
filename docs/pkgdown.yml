@@ -3,5 +3,9 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   extract_seqs: extract_seqs.html
+<<<<<<< HEAD
 last_built: 2023-08-29T21:04Z
+=======
+last_built: 2023-08-29T20:54Z
+>>>>>>> a158d69bfce891badf84701275f44e6c157a353f
 
