@@ -9,9 +9,9 @@
 #' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 #' @examples
 #' ## not run:
-#' # tmp <- extract_seqs(folder="20220919T102058_esampayo", type="absolute", clade=c("C", "D"))
+#' # tmp <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="absolute", clade=c("C", "D"))
 #
-#' # tmp2 <- extract_seqs(folder="20220919T102058_esampayo", type="relative", clade="C", cutoff=100)
+#' # tmp2 <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", cutoff=100)
 
 
 extract_seqs <- function(folder, type = "relative", clade = LETTERS[1:10], cutoff=1000, silent=TRUE) {
