@@ -8,7 +8,9 @@ extract_seqs_long(
   folder,
   type = "relative",
   clade = LETTERS[1:10],
-  cutoff = 1000,
+  threshold = 1000,
+  drop_samples = NULL,
+  drop_seqs = NULL,
   silent = TRUE
 )
 }
@@ -19,18 +21,24 @@ extract_seqs_long(
 
 \item{clade}{filter by single "C" or multiple clades c("C", "D") to filter sequences by}
 
-\item{cutoff}{Set threshold to remove samples if less than the cutoff (defaults to 1000)}
+\item{threshold}{Set threshold to remove samples if less than the threshold (defaults to 1000)}
+
+\item{drop_samples}{drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")}
+
+\item{drop_seqs}{drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")}
 
 \item{silent}{defaults to TRUE, if FALSE then prints a list of removed sample names}
 }
 \value{
-A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences. This is the same function as extract_seqs, but returns in long format not wide.
+A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 }
 \description{
-Function to extract sequences from symportal output
+same as extract_seqs but in long format
 }
 \examples{
-## not run:
-# tmp <- extract_seqs_long(folder="20220919T102058_esampayo", type="absolute", clade=c("C", "D"))
-# tmp2 <- extract_seqs_long(folder="20220919T102058_esampayo", type="relative", clade="C", cutoff=100)
+
+tmp <- extract_seqs_long(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="absolute", clade=c("C", "D"))
+
+tmp2 <- extract_seqs_long(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", threshold=100)
+
 }

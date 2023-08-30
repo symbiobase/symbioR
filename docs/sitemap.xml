@@ -10,6 +10,9 @@
     <loc>/LICENSE.html</loc>
   </url>
   <url>
+    <loc>/articles/code comparison.html</loc>
+  </url>
+  <url>
     <loc>/articles/extract_seqs.html</loc>
   </url>
   <url>
@@ -25,13 +28,25 @@
     <loc>/reference/extract_its2.html</loc>
   </url>
   <url>
+    <loc>/reference/extract_its2_names.html</loc>
+  </url>
+  <url>
     <loc>/reference/extract_its2_profile.html</loc>
   </url>
   <url>
     <loc>/reference/extract_its2_profile_UID.html</loc>
   </url>
   <url>
+    <loc>/reference/extract_its2_profile_seqs.html</loc>
+  </url>
+  <url>
+    <loc>/reference/extract_its2_profile_split.html</loc>
+  </url>
+  <url>
     <loc>/reference/extract_metadata.html</loc>
+  </url>
+  <url>
+    <loc>/reference/extract_plot_colors.html</loc>
   </url>
   <url>
     <loc>/reference/extract_seqs.html</loc>

@@ -1,0 +1,5 @@
+/* custom.css */
+body {
+  max-width: 960;  /* or 80%, or another preferred width */
+  margin: auto;
+}

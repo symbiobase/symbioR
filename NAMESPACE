@@ -2,9 +2,13 @@
 
 export("%>%")
 export(extract_its2)
+export(extract_its2_names)
 export(extract_its2_profile)
 export(extract_its2_profile_UID)
+export(extract_its2_profile_seqs)
+export(extract_its2_profile_split)
 export(extract_metadata)
+export(extract_plot_colors)
 export(extract_seqs)
 export(extract_seqs_long)
 importFrom(magrittr,"%>%")

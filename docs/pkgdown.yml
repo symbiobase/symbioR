@@ -2,6 +2,7 @@ pandoc: 3.1.1
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
+  code comparison: code comparison.html
   extract_seqs: extract_seqs.html
-last_built: 2023-08-30T01:47Z
+last_built: 2023-08-30T11:41Z
 
