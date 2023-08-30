@@ -1,9 +1,23 @@
+
+
+####
+# Sample removal:
+# cutoff = removes seq less than threshold
+# drop_samples = by vector of sample names, e.g.c("H00B05")
+# drop_samples_match = by partial sample names, e.g.c("H0")
+# drop_seqs = by vector of sequence ID
+#
+# calculate relative abundance AFTER sample changes.
+
+
+######
+
 library(symportalfunctions)
 library(tidyverse)
 library(ggridges)
 
 
-plot_data <- extract_seqs_long(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C") |>
+plot_data <- extract_seqs_long(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", cutoff=1000, clade="C") |>
   mutate(numeric.ID = as.numeric((as.factor(seq.ID)))) |>
   mutate(sample.ID = as.factor(sample.ID)) |>
 #  filter(abundance>0.01) |>

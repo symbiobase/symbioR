@@ -82,96 +82,63 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">load_all</a></span><span class="op">(</span><span class="op">)</span> </span>
 <span><span class="co">#install("/Users/rof011/symportalfunctions")</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://marine-ecologist.github.io/symportalfunctions/" class="external-link">symportalfunctions</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#library(symportalfunctions)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="extract_seqs">extract_seqs<a class="anchor" aria-label="anchor" href="#extract_seqs"></a>
 </h2>
-<details><summary align="right"><b>Show Code</b>
-</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span></span>
-<span><span class="va">extract_seqs</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">folder</span>, <span class="va">type</span> <span class="op">=</span> <span class="st">"relative"</span>, <span class="va">clade</span> <span class="op">=</span> <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>, <span class="va">cutoff</span><span class="op">=</span><span class="fl">1000</span>, <span class="va">silent</span><span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">{</span></span>
-<span></span>
-<span>  <span class="va">file_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">folder</span>, pattern <span class="op">=</span> <span class="st">"seqs.absolute.abund_and_meta.txt"</span>, include.dirs <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="va">absolute</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.delim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">folder</span>, <span class="st">"/"</span>, <span class="va">file_list</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="fl">40</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># select just the symbiodinium columns</span></span>
-<span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"sample_name"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># sample_name column to rowname</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># remove the last row, summary data</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.numeric</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">cutoff</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># remove samples where &lt;1000 sequences</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="va">clade</span>, ignore.case <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># keep only columns matching "clade"</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.numeric</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># drop zero sum rows</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">.</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># drop zero sum columns</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>  <span class="co"># drop blank columns</span></span>
-<span></span>
-<span>  <span class="va">excluded_samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.delim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">folder</span>, <span class="st">"/"</span>, <span class="va">file_list</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="fl">40</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># select just the symbiodinium columns</span></span>
-<span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"sample_name"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># sample_name column to rowname</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># remove the last row, summary data</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="va">clade</span>, ignore.case <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># keep only columns matching "clade"</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.numeric</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">cutoff</span><span class="op">)</span><span class="op">)</span> <span class="co"># remove samples where &lt;1000 sequences</span></span>
-<span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">silent</span><span class="op">==</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Excluded samples \n"</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">excluded_samples</span><span class="op">)</span><span class="op">)</span>, collapse<span class="op">=</span><span class="st">"\n"</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span></span>
-<span>  <span class="va">relative</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.delim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">folder</span>, <span class="st">"/"</span>, <span class="va">file_list</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_name</span>, <span class="fl">40</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># select just the symbiodinium columns</span></span>
-<span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"sample_name"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># sample_name column to rowname</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># remove the last row, summary data</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.numeric</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">cutoff</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># remove samples where &lt;1000 sequences</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="va">clade</span>, ignore.case <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># keep only columns matching "clade"</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.numeric</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># drop zero sum rows</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">.</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># drop zero sum columns</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># drop blank columns</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>row_sum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.numeric</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/where.html" class="external-link">where</a></span><span class="op">(</span><span class="va">is.numeric</span><span class="op">)</span>, <span class="op">~</span> <span class="va">.</span> <span class="op">/</span> <span class="va">row_sum</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">row_sum</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"absolute"</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">absolute</span><span class="op">)</span></span>
-<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"relative"</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">relative</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-</details><p>Extracts sequences from
+<p>Extracts sequences from
 “<code>seqs.absolute.abund_and_meta.txt</code>” in the
 <code>post_med_seqs</code> folder.</p>
 <p><code>extract_seqs(folder= "20220919T102058_esampayo", type="absolute", clade="C")</code></p>
 <ul>
 <li>
 <code>folder</code> = name of the <u><strong>main</strong></u>
-folder for symportal</li>
+folder for symportal *</li>
 <li>
 <code>type</code> = “absolute” or “relative” abundance</li>
 <li>
 <code>clade</code> = vector of clade types to keep, can be single,
 e.g. clade=“C”, or multiple e.g. clade=c(“C”, “D”)</li>
 <li>
-<code>seqs</code> = cutoff threshold to remove samples,
+<code>threshold</code> = threshold threshold to remove samples,
 <code>1000</code> by default</li>
+<li>
+<code>drop_samples</code> = drop samples by named vector,
+e.g. c(“H00B07”, “H00B06”), or by one or more partial matches,
+e.g. c(“07”,“B06”) **</li>
+<li>
+<code>drop_seqs</code> = drop seqs by named vector,
+e.g. c(“X2777817_G”, “X2777816_G”), or by one or more partial matches,
+e.g. c(“X2”,“OT”) **</li>
 <li>
 <code>silent</code> = either <code>TRUE</code> or
 <code>FALSE</code>, show which samples were removed by name</li>
 </ul>
-<p>Note: the <code>folder</code> name should be <u>only</u> the base
-folder. For example, the folder for the following location:</p>
-<p><code>"20220919T102058_esampayo/post_med_seqs/224_20220926T061917_DBV_20220926T133809.seqs.absolute.abund_and_meta.txt"</code></p>
-<p>Should be:</p>
-<p><code>folder="20220919T102058_esampayo"</code>, and the function will
-locate the correct txt file
-(<code>"...seqs.absolute.abund_and_meta.txt"</code>) automatically from
-there.</p>
+<div class="section level4">
+<h4 id="notes">Notes:<a class="anchor" aria-label="anchor" href="#notes"></a>
+</h4>
+<p>* the <code>folder</code> name should be <u>only</u> the base folder.
+For example, the folder for the following location
+<code>("20220919T102058_esampayo/post_med_seqs/224_20220926T061917_DBV_20220926T133809.seqs.absolute.abund_and_meta.txt")</code>
+should be: <code>(folder="20220919T102058_esampayo"</code>). The
+function will locate the correct txt file
+(<code>"...seqs.absolute.abund_and_meta.txt"</code>) automatically.</p>
+<p>** both <code>drop_samples</code> and <code>drop_seqs</code> accept
+either full names or partial matches for seqs and samples. Be careful to
+specify the exact full sample name or it will filter by a partial
+match.</p>
+</div>
 <div class="section level3">
 <h3 id="extract_seqs-examples">extract_seqs examples<a class="anchor" aria-label="anchor" href="#extract_seqs-examples"></a>
 </h3>
 <div class="section level4">
 <h4 id="i-get-the-absolute-abundance-of-all-sequences">i) get the absolute abundance of all sequences<a class="anchor" aria-label="anchor" href="#i-get-the-absolute-abundance-of-all-sequences"></a>
 </h4>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"absolute"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"absolute"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">tmp</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span> <span class="co"># show first 5 cols, 10 rows</span></span>
 <span><span class="co">#&gt;               A3 X2777800_A X2777807_A X2355146_A X2777790_A X779485_A</span></span>
@@ -190,7 +157,7 @@ there.</p>
 <div class="section level4">
 <h4 id="ii-get-the-absolute-abundance-of-c-and-d-sequences">ii) get the absolute abundance of C and D sequences:<a class="anchor" aria-label="anchor" href="#ii-get-the-absolute-abundance-of-c-and-d-sequences"></a>
 </h4>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">#symportalfolder="/Users/rof011/symbiodinium/20220919T102058_esampayo"</span></span>
 <span></span>
@@ -207,7 +174,7 @@ there.</p>
 <div class="section level4">
 <h4 id="iii-get-the-relative-abundance-of-c-sequences">iii) get the relative abundance of C sequences:<a class="anchor" aria-label="anchor" href="#iii-get-the-relative-abundance-of-c-sequences"></a>
 </h4>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, clade<span class="op">=</span><span class="st">"C"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">tmp</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>,<span class="fl">3</span><span class="op">)</span> <span class="co"># show first 5 cols, 10 rows, round to 3 decimal places</span></span>
@@ -221,10 +188,10 @@ there.</p>
 <div class="section level4">
 <h4 id="iv-remove-samples-with-100-seqs-in-total">iv) remove samples with &lt;100 seqs in total:<a class="anchor" aria-label="anchor" href="#iv-remove-samples-with-100-seqs-in-total"></a>
 </h4>
-<p>The cutoff threshold by default is 1000 seqs, changing it here
+<p>The threshold threshold by default is 1000 seqs, changing it here
 manually will lower this threshold to 100 seqs</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, clade<span class="op">=</span><span class="st">"C"</span>, cutoff<span class="op">=</span><span class="fl">100</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, clade<span class="op">=</span><span class="st">"C"</span>, threshold<span class="op">=</span><span class="fl">100</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">tmp</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>,<span class="fl">3</span><span class="op">)</span> <span class="co"># show first 5 cols, 10 rows, round to 3 decimal places</span></span>
 <span><span class="co">#&gt;                  C8 C78c    C1 C79   C8a C35.3 C35.1 C42.2 C54l  C3lk</span></span>
@@ -235,21 +202,12 @@ manually will lower this threshold to 100 seqs</p>
 <span><span class="co">#&gt; H06P09        0.365    0 0.055   0 0.328     0     0 0.030    0 0.000</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="v-show-removed-samples">v) show removed samples:<a class="anchor" aria-label="anchor" href="#v-show-removed-samples"></a>
+<h4 id="iv-remove-samples-with-100-seqs-in-total-1">iv) remove samples with &lt;100 seqs in total:<a class="anchor" aria-label="anchor" href="#iv-remove-samples-with-100-seqs-in-total-1"></a>
 </h4>
-<p>The default setting is <code>silent=TRUE</code>, set to
-<code>FALSE</code> to print removed sample names below the cutoff</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, clade<span class="op">=</span><span class="st">"C"</span>, cutoff<span class="op">=</span><span class="fl">100</span>, silent<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Excluded samples </span></span>
-<span><span class="co">#&gt;  - PCR1c_n2</span></span>
-<span><span class="co">#&gt;  - H18P03_ES22OT</span></span>
-<span><span class="co">#&gt;  - H18B11_ES22</span></span>
-<span><span class="co">#&gt;  - H00B08_ES22</span></span>
-<span><span class="co">#&gt;  - H18P04_ES22</span></span>
-<span><span class="co">#&gt;  - H18P06_PB</span></span>
-<span><span class="co">#&gt;  - PCR1a_n2</span></span>
-<span><span class="co">#&gt;  - H06S05</span></span>
+<p>The threshold threshold by default is 1000 seqs, changing it here
+manually will lower this threshold to 100 seqs</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, clade<span class="op">=</span><span class="st">"C"</span>, threshold<span class="op">=</span><span class="fl">100</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">tmp</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>,<span class="fl">3</span><span class="op">)</span> <span class="co"># show first 5 cols, 10 rows, round to 3 decimal places</span></span>
 <span><span class="co">#&gt;                  C8 C78c    C1 C79   C8a C35.3 C35.1 C42.2 C54l  C3lk</span></span>
@@ -259,6 +217,194 @@ manually will lower this threshold to 100 seqs</p>
 <span><span class="co">#&gt; H18P04        0.555    0 0.027   0 0.195     0     0 0.023    0 0.000</span></span>
 <span><span class="co">#&gt; H06P09        0.365    0 0.055   0 0.328     0     0 0.030    0 0.000</span></span></code></pre></div>
 </div>
+<div class="section level4">
+<h4 id="v-drop-samples-containing-ot-and-h18">v) drop samples containing “OT” and “H18”<a class="anchor" aria-label="anchor" href="#v-drop-samples-containing-ot-and-h18"></a>
+</h4>
+<p>The threshold threshold by default is 1000 seqs, changing it here
+manually will lower this threshold to 100 seqs</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, drop_samples <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OT"</span>, <span class="st">"H18"</span><span class="op">)</span>, silent<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Excluded samples </span></span>
+<span><span class="co">#&gt;  - H18B10_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18B11_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18P07</span></span>
+<span><span class="co">#&gt;  - H18P04</span></span>
+<span><span class="co">#&gt;  - H18B07_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18P03_ES22</span></span>
+<span><span class="co">#&gt;  - H18P03</span></span>
+<span><span class="co">#&gt;  - H18P05</span></span>
+<span><span class="co">#&gt;  - H18P08</span></span>
+<span><span class="co">#&gt;  - H18P10</span></span>
+<span><span class="co">#&gt;  - H18P11</span></span>
+<span><span class="co">#&gt;  - H18P03_PB</span></span>
+<span><span class="co">#&gt;  - H18P06</span></span>
+<span><span class="co">#&gt;  - H18P09</span></span>
+<span><span class="co">#&gt;  - H18B02</span></span>
+<span><span class="co">#&gt;  - H18P01</span></span>
+<span><span class="co">#&gt;  - H18P12</span></span>
+<span><span class="co">#&gt;  - H18P02</span></span>
+<span><span class="co">#&gt;  - H06B03_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06B08</span></span>
+<span><span class="co">#&gt;  - H06S08</span></span>
+<span><span class="co">#&gt;  - H06S07_ES22OT</span></span>
+<span><span class="co">#&gt;  - H00B08_ES22OT</span></span>
+<span><span class="co">#&gt;  - H00B06_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18B04</span></span>
+<span><span class="co">#&gt;  - H18B08</span></span>
+<span><span class="co">#&gt;  - H18B10</span></span>
+<span><span class="co">#&gt;  - H18B06</span></span>
+<span><span class="co">#&gt;  - H18B08_ES22</span></span>
+<span><span class="co">#&gt;  - H18B07</span></span>
+<span><span class="co">#&gt;  - H18B03</span></span>
+<span><span class="co">#&gt;  - H18B05</span></span>
+<span><span class="co">#&gt;  - H18B07_ES22</span></span>
+<span><span class="co">#&gt;  - H18B03_PB</span></span>
+<span><span class="co">#&gt;  - H18B12</span></span>
+<span><span class="co">#&gt;  - H18B11</span></span>
+<span><span class="co">#&gt;  - H18B01</span></span>
+<span><span class="co">#&gt;  - H18B09</span></span>
+<span><span class="co">#&gt;  - H18B01_PB</span></span>
+<span><span class="co">#&gt;  - H06P07_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06P03_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06B07_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06B05_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06B02_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18B10_ES22_ns</span></span>
+<span><span class="co">#&gt;  - H18B08_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06S12_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06B11_PB</span></span>
+<span><span class="co">#&gt;  - PCR1c_n2</span></span>
+<span><span class="co">#&gt;  - PCR1c_n1to2</span></span>
+<span><span class="co">#&gt;  - H18P04_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18P03_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18B11_ES22</span></span>
+<span><span class="co">#&gt;  - H00B08_ES22</span></span>
+<span><span class="co">#&gt;  - H18P04_ES22</span></span>
+<span><span class="co">#&gt;  - H18P06_PB</span></span>
+<span><span class="co">#&gt;  - PCR1a_n2</span></span>
+<span><span class="co">#&gt;  - H06S05</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">tmp</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>,<span class="fl">3</span><span class="op">)</span> <span class="co"># show first 5 cols, 10 rows, round to 3 decimal places</span></span>
+<span><span class="co">#&gt;             A3 X2777800_A X2777807_A X779485_A X2777802_A X2777801_A    C8 C78c</span></span>
+<span><span class="co">#&gt; H06P09       0          0          0         0          0          0 0.365    0</span></span>
+<span><span class="co">#&gt; H06P12       0          0          0         0          0          0 0.385    0</span></span>
+<span><span class="co">#&gt; H06P06       0          0          0         0          0          0 0.399    0</span></span>
+<span><span class="co">#&gt; H06P04       0          0          0         0          0          0 0.387    0</span></span>
+<span><span class="co">#&gt; H06P07_ES22  0          0          0         0          0          0 0.475    0</span></span>
+<span><span class="co">#&gt;                C1 C79</span></span>
+<span><span class="co">#&gt; H06P09      0.055   0</span></span>
+<span><span class="co">#&gt; H06P12      0.047   0</span></span>
+<span><span class="co">#&gt; H06P06      0.056   0</span></span>
+<span><span class="co">#&gt; H06P04      0.053   0</span></span>
+<span><span class="co">#&gt; H06P07_ES22 0.045   0</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="vi-drop-seqs-containing-ot-and-h18">vi) drop seqs containing “OT” and “H18”<a class="anchor" aria-label="anchor" href="#vi-drop-seqs-containing-ot-and-h18"></a>
+</h4>
+<p>The default setting is <code>silent=TRUE</code>, set to
+<code>FALSE</code> to print removed sample names below the threshold</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, drop_seqs<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"G"</span><span class="op">)</span>, silent<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Excluded samples </span></span>
+<span><span class="co">#&gt;  - H06B03_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06B08</span></span>
+<span><span class="co">#&gt;  - H06S08</span></span>
+<span><span class="co">#&gt;  - H18B01_PB</span></span>
+<span><span class="co">#&gt;  - H06B11_PB</span></span>
+<span><span class="co">#&gt;  - PCR1c_n2</span></span>
+<span><span class="co">#&gt;  - PCR1c_n1to2</span></span>
+<span><span class="co">#&gt;  - H18P04_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18P03_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18B11_ES22</span></span>
+<span><span class="co">#&gt;  - H00B08_ES22</span></span>
+<span><span class="co">#&gt;  - H18P04_ES22</span></span>
+<span><span class="co">#&gt;  - H18P06_PB</span></span>
+<span><span class="co">#&gt;  - PCR1a_n2</span></span>
+<span><span class="co">#&gt;  - H06S05</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">tmp</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>,<span class="fl">3</span><span class="op">)</span> <span class="co"># show first 5 cols, 10 rows, round to 3 decimal places</span></span>
+<span><span class="co">#&gt;               A3    C8 C78c    C1 C79   C8a C35.3 C35.1 C42.2 C54l</span></span>
+<span><span class="co">#&gt; H18B10_ES22OT  0 0.525    0 0.055   0 0.288     0     0 0.045    0</span></span>
+<span><span class="co">#&gt; H18B11_ES22OT  0 0.549    0 0.054   0 0.262     0     0 0.027    0</span></span>
+<span><span class="co">#&gt; H18P07         0 0.495    0 0.048   0 0.216     0     0 0.054    0</span></span>
+<span><span class="co">#&gt; H18P04         0 0.581    0 0.028   0 0.205     0     0 0.024    0</span></span>
+<span><span class="co">#&gt; H06P09         0 0.376    0 0.057   0 0.338     0     0 0.031    0</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="vi-drop-seqs-and-samples-list-removed-names">vi) drop seqs and samples, list removed names<a class="anchor" aria-label="anchor" href="#vi-drop-seqs-and-samples-list-removed-names"></a>
+</h4>
+<p>The default setting is <code>silent=TRUE</code>, set to
+<code>FALSE</code> to print removed sample names below the threshold</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, drop_seqs<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"G"</span><span class="op">)</span>, drop_samples <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OT"</span>, <span class="st">"H18"</span><span class="op">)</span>, silent<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Excluded samples </span></span>
+<span><span class="co">#&gt;  - H18B10_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18B11_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18P07</span></span>
+<span><span class="co">#&gt;  - H18P04</span></span>
+<span><span class="co">#&gt;  - H18B07_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18P03_ES22</span></span>
+<span><span class="co">#&gt;  - H18P03</span></span>
+<span><span class="co">#&gt;  - H18P05</span></span>
+<span><span class="co">#&gt;  - H18P08</span></span>
+<span><span class="co">#&gt;  - H18P10</span></span>
+<span><span class="co">#&gt;  - H18P11</span></span>
+<span><span class="co">#&gt;  - H18P03_PB</span></span>
+<span><span class="co">#&gt;  - H18P06</span></span>
+<span><span class="co">#&gt;  - H18P09</span></span>
+<span><span class="co">#&gt;  - H18B02</span></span>
+<span><span class="co">#&gt;  - H18P01</span></span>
+<span><span class="co">#&gt;  - H18P12</span></span>
+<span><span class="co">#&gt;  - H18P02</span></span>
+<span><span class="co">#&gt;  - H06B03_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06B08</span></span>
+<span><span class="co">#&gt;  - H06S08</span></span>
+<span><span class="co">#&gt;  - H06S07_ES22OT</span></span>
+<span><span class="co">#&gt;  - H00B08_ES22OT</span></span>
+<span><span class="co">#&gt;  - H00B06_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18B04</span></span>
+<span><span class="co">#&gt;  - H18B08</span></span>
+<span><span class="co">#&gt;  - H18B10</span></span>
+<span><span class="co">#&gt;  - H18B06</span></span>
+<span><span class="co">#&gt;  - H18B08_ES22</span></span>
+<span><span class="co">#&gt;  - H18B07</span></span>
+<span><span class="co">#&gt;  - H18B03</span></span>
+<span><span class="co">#&gt;  - H18B05</span></span>
+<span><span class="co">#&gt;  - H18B07_ES22</span></span>
+<span><span class="co">#&gt;  - H18B03_PB</span></span>
+<span><span class="co">#&gt;  - H18B12</span></span>
+<span><span class="co">#&gt;  - H18B11</span></span>
+<span><span class="co">#&gt;  - H18B01</span></span>
+<span><span class="co">#&gt;  - H18B09</span></span>
+<span><span class="co">#&gt;  - H18B01_PB</span></span>
+<span><span class="co">#&gt;  - H06P07_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06P03_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06B07_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06B05_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06B02_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18B10_ES22_ns</span></span>
+<span><span class="co">#&gt;  - H18B08_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06S12_ES22OT</span></span>
+<span><span class="co">#&gt;  - H06B11_PB</span></span>
+<span><span class="co">#&gt;  - PCR1c_n2</span></span>
+<span><span class="co">#&gt;  - PCR1c_n1to2</span></span>
+<span><span class="co">#&gt;  - H18P04_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18P03_ES22OT</span></span>
+<span><span class="co">#&gt;  - H18B11_ES22</span></span>
+<span><span class="co">#&gt;  - H00B08_ES22</span></span>
+<span><span class="co">#&gt;  - H18P04_ES22</span></span>
+<span><span class="co">#&gt;  - H18P06_PB</span></span>
+<span><span class="co">#&gt;  - PCR1a_n2</span></span>
+<span><span class="co">#&gt;  - H06S05</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">tmp</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>,<span class="fl">3</span><span class="op">)</span> <span class="co"># show first 5 cols, 10 rows, round to 3 decimal places</span></span>
+<span><span class="co">#&gt;             A3    C8 C78c    C1 C79   C8a C35.3 C35.1 C42.2 C54l</span></span>
+<span><span class="co">#&gt; H06P09       0 0.376    0 0.057   0 0.338     0     0 0.031    0</span></span>
+<span><span class="co">#&gt; H06P12       0 0.399    0 0.048   0 0.312     0     0 0.041    0</span></span>
+<span><span class="co">#&gt; H06P06       0 0.413    0 0.058   0 0.214     0     0 0.057    0</span></span>
+<span><span class="co">#&gt; H06P04       0 0.401    0 0.055   0 0.193     0     0 0.066    0</span></span>
+<span><span class="co">#&gt; H06P07_ES22  0 0.510    0 0.049   0 0.155     0     0 0.052    0</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="example-plot-stacked-bar-graph-of-sequences-ggplot">example: Plot stacked bar graph of sequences (ggplot)<a class="anchor" aria-label="anchor" href="#example-plot-stacked-bar-graph-of-sequences-ggplot"></a>
@@ -267,7 +413,7 @@ manually will lower this threshold to 100 seqs</p>
 <code>extract_seqs_long</code>. It’s identical to
 <code>extract_seqs</code>, just returns in a long rather than wide
 format.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># extract seqs</span></span>
 <span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs_long.html">extract_seqs_long</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, clade<span class="op">=</span><span class="st">"C"</span><span class="op">)</span> </span>
 <span>  </span>
@@ -276,15 +422,15 @@ format.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">plot_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">sample.ID</span>, y <span class="op">=</span> <span class="va">abundance</span>, fill <span class="op">=</span> <span class="va">seq.ID</span><span class="op">)</span>, color<span class="op">=</span><span class="st">"black"</span>, </span>
 <span>           linewidth<span class="op">=</span><span class="fl">0.2</span>, stat <span class="op">=</span> <span class="st">"identity"</span>, show.legend<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">90</span>, vjust <span class="op">=</span> <span class="fl">0.5</span>, hjust<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="extract_seqs_files/figure-html/unnamed-chunk-9-1.png" width="960"></p>
+<p><img src="extract_seqs_files/figure-html/unnamed-chunk-11-1.png" width="960"></p>
 </div>
 <div class="section level3">
 <h3 id="example-plot-dendrogram-with-km-clusters">example: plot dendrogram with KM clusters<a class="anchor" aria-label="anchor" href="#example-plot-dendrogram-with-km-clusters"></a>
 </h3>
 <p>Second example: use <code>extract_seqs</code> with vegan to get
 dendrogram and clusters.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cluster.C</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, clade<span class="op">=</span><span class="st">"C"</span>, cutoff<span class="op">=</span><span class="fl">100</span><span class="op">)</span> </span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cluster.C</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, clade<span class="op">=</span><span class="st">"C"</span>, threshold<span class="op">=</span><span class="fl">100</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/vegandevs/vegan" class="external-link">vegan</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: permute</span></span>
@@ -302,7 +448,7 @@ dendrogram and clusters.</p>
 <span></span>
 <span><span class="va">cluster.C.km.grps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">cluster.C.km</span><span class="op">[[</span><span class="st">"partition"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span>var<span class="op">=</span><span class="st">"sample.ID"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://talgalili.github.io/dendextend/" class="external-link">dendextend</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Registered S3 method overwritten by 'dendextend':</span></span>
 <span><span class="co">#&gt;   method     from </span></span>
@@ -335,10 +481,10 @@ dendrogram and clusters.</p>
 <span></span>
 <span><span class="va">cluster.C.dend</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/dendrogram.html" class="external-link">as.dendrogram</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a></span><span class="op">(</span><span class="va">cluster.C.dist</span>, method <span class="op">=</span> <span class="st">"complete"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="http://talgalili.github.io/dendextend/reference/color_labels.html" class="external-link">color_labels</a></span><span class="op">(</span><span class="va">.</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cluster.C.dend</span>, main<span class="op">=</span><span class="st">"Postmed C sequences &gt;100 seqs"</span>, ylab<span class="op">=</span><span class="st">"Bray Curtis"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="extract_seqs_files/figure-html/unnamed-chunk-11-1.png" width="960"></p>
-<p>Now tune the noise with cutoff:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cluster.C</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, clade<span class="op">=</span><span class="st">"C"</span>, cutoff<span class="op">=</span><span class="fl">10000</span><span class="op">)</span> </span>
+<p><img src="extract_seqs_files/figure-html/unnamed-chunk-13-1.png" width="960"></p>
+<p>Now tune the noise with threshold:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cluster.C</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_seqs.html">extract_seqs</a></span><span class="op">(</span>folder<span class="op">=</span><span class="st">"/Users/rof011/symbiodinium/20220919T102058_esampayo"</span>, type<span class="op">=</span><span class="st">"relative"</span>, clade<span class="op">=</span><span class="st">"C"</span>, threshold<span class="op">=</span><span class="fl">10000</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="va">cluster.C.dist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/vegdist.html" class="external-link">vegdist</a></span><span class="op">(</span><span class="va">cluster.C</span>, method <span class="op">=</span><span class="st">"bray"</span><span class="op">)</span></span>
 <span><span class="va">cluster.C.km</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/vegan/man/cascadeKM.html" class="external-link">cascadeKM</a></span><span class="op">(</span><span class="va">cluster.C.dist</span>, <span class="fl">1</span>, <span class="fl">10</span>, iter <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span>
@@ -348,7 +494,7 @@ dendrogram and clusters.</p>
 <span></span>
 <span><span class="va">cluster.C.dend</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/dendrogram.html" class="external-link">as.dendrogram</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a></span><span class="op">(</span><span class="va">cluster.C.dist</span>, method <span class="op">=</span> <span class="st">"complete"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="http://talgalili.github.io/dendextend/reference/color_labels.html" class="external-link">color_labels</a></span><span class="op">(</span><span class="va">.</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cluster.C.dend</span>, main<span class="op">=</span><span class="st">"Postmed C sequences &gt;10,000 seqs"</span>, ylab<span class="op">=</span><span class="st">"Bray Curtis"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="extract_seqs_files/figure-html/unnamed-chunk-12-1.png" width="960"></p>
+<p><img src="extract_seqs_files/figure-html/unnamed-chunk-14-1.png" width="960"></p>
 </div>
 </div>
   </div>

@@ -58,7 +58,9 @@
 <span>  <span class="va">folder</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"relative"</span>,</span>
 <span>  clade <span class="op">=</span> <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>,</span>
-<span>  cutoff <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  threshold <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  drop_samples <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  drop_seqs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  silent <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -77,8 +79,16 @@
 <dd><p>filter by single "C" or multiple clades c("C", "D") to filter sequences by</p></dd>
 
 
-<dt>cutoff</dt>
-<dd><p>Set threshold to remove samples if less than the cutoff (defaults to 1000)</p></dd>
+<dt>threshold</dt>
+<dd><p>Set threshold to remove samples if less than the threshold (defaults to 1000)</p></dd>
+
+
+<dt>drop_samples</dt>
+<dd><p>drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")</p></dd>
+
+
+<dt>drop_seqs</dt>
+<dd><p>drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")</p></dd>
 
 
 <dt>silent</dt>
@@ -95,8 +105,9 @@
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">#tmp &lt;- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="absolute", clade=c("C", "D"))</span></span></span>
-<span class="r-in"><span><span class="co">#tmp2 &lt;- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", cutoff=100)</span></span></span>
+<span class="r-in"><span><span class="co"># tmp &lt;- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="absolute", clade=c("C", "D"))</span></span></span>
+<span class="r-in"><span><span class="co">#</span></span></span>
+<span class="r-in"><span><span class="co"># tmp2 &lt;- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", threshold=100)</span></span></span>
 <span class="r-in"></span>
 </code></pre></div>
     </div>

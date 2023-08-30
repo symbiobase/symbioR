@@ -18,88 +18,37 @@ knitr::opts_chunk$set(
 library(tidyverse)
 library(ggplot2)
 library(devtools)
+devtools::load_all() 
 #install("/Users/rof011/symportalfunctions")
-library(symportalfunctions)
+#library(symportalfunctions)
 ```
 
 # extract_seqs
-<details><summary align="right"><b>Show Code</b></summary>
 
-```{r, eval=FALSE, include=TRUE}
-
-
-extract_seqs <- function(folder, type = "relative", clade = LETTERS[1:10], cutoff=1000, silent=TRUE) {
-
-  file_list <- list.files(path = folder, pattern = "seqs.absolute.abund_and_meta.txt", include.dirs = TRUE, recursive = TRUE)
-
-  absolute <- read.delim(paste0(folder, "/", file_list)) %>%
-    dplyr::select(sample_name, 40:ncol(.)) %>% # select just the symbiodinium columns
-    tibble::column_to_rownames("sample_name") %>% # sample_name column to rowname
-    dplyr::slice(-n()) %>% # remove the last row, summary data
-    dplyr::filter(rowSums(select(., where(is.numeric))) > as.numeric(cutoff)) %>% # remove samples where <1000 sequences
-    dplyr::select(dplyr::matches(clade, ignore.case = FALSE)) %>% # keep only columns matching "clade"
-    dplyr::filter(rowSums(dplyr::select(., dplyr::where(is.numeric))) != 0) %>% # drop zero sum rows
-    dplyr::select(dplyr::where(~ sum(. != 0) > 0)) %>% # drop zero sum columns
-    dplyr::select(dplyr::where(~ any(!is.na(.))))  # drop blank columns
-
-  excluded_samples <- read.delim(paste0(folder, "/", file_list)) %>%
-    dplyr::select(sample_name, 40:ncol(.)) %>% # select just the symbiodinium columns
-    tibble::column_to_rownames("sample_name") %>% # sample_name column to rowname
-    dplyr::slice(-n()) %>% # remove the last row, summary data
-    dplyr::select(dplyr::matches(clade, ignore.case = FALSE)) %>% # keep only columns matching "clade"
-    dplyr::filter(rowSums(select(., where(is.numeric))) < as.numeric(cutoff)) # remove samples where <1000 sequences
-
-  if (silent==FALSE){
-    cat("Excluded samples \n")
-    cat(paste(unique(rownames(excluded_samples)), collapse="\n"), "\n")
-  }
-
-  relative <- read.delim(paste0(folder, "/", file_list)) %>%
-    dplyr::select(sample_name, 40:ncol(.)) %>% # select just the symbiodinium columns
-    tibble::column_to_rownames("sample_name") %>% # sample_name column to rowname
-    dplyr::slice(-n()) %>% # remove the last row, summary data
-    dplyr::filter(rowSums(select(., where(is.numeric))) > as.numeric(cutoff)) %>% # remove samples where <1000 sequences
-    dplyr::select(dplyr::matches(clade, ignore.case = FALSE)) %>% # keep only columns matching "clade"
-    dplyr::filter(rowSums(dplyr::select(., dplyr::where(is.numeric))) != 0) %>% # drop zero sum rows
-    dplyr::select(dplyr::where(~ sum(. != 0) > 0)) %>% # drop zero sum columns
-    dplyr::select(dplyr::where(~ any(!is.na(.)))) %>% # drop blank columns
-    dplyr::mutate(row_sum = rowSums(select(., dplyr::where(is.numeric)))) %>%
-    dplyr::mutate(across(dplyr::where(is.numeric), ~ . / row_sum)) %>%
-    dplyr::select(-row_sum)
-
-  if (type == "absolute") {
-    return(absolute)
-  } else if (type == "relative") {
-    return(relative)
-  }
-}
-
-```
-</details>
 Extracts sequences from "`seqs.absolute.abund_and_meta.txt`" in the `post_med_seqs` folder.
 
 `extract_seqs(folder= "20220919T102058_esampayo", type="absolute", clade="C")`
 
--   `folder` = name of the [**main**]{.underline} folder for symportal
+-   `folder` = name of the [**main**]{.underline} folder for symportal \*
 -   `type` = "absolute" or "relative" abundance
 -   `clade` = vector of clade types to keep, can be single, e.g. clade="C", or multiple e.g. clade=c("C", "D")
--   `seqs` = cutoff threshold to remove samples, `1000` by default
+-   `threshold` = threshold threshold to remove samples, `1000` by default
+-   `drop_samples` = drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06") \*\*
+-   `drop_seqs` = drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT") \*\*
 -   `silent` = either `TRUE` or `FALSE`, show which samples were removed by name
 
-Note: the `folder` name should be [only]{.underline} the base folder. For example, the folder for the following location:
+### Notes:
 
-`"20220919T102058_esampayo/post_med_seqs/224_20220926T061917_DBV_20220926T133809.seqs.absolute.abund_and_meta.txt"`
+\* the `folder` name should be [only]{.underline} the base folder. For example, the folder for the following location `("20220919T102058_esampayo/post_med_seqs/224_20220926T061917_DBV_20220926T133809.seqs.absolute.abund_and_meta.txt")` should be: `(folder="20220919T102058_esampayo"`). The function will locate the correct txt file (`"...seqs.absolute.abund_and_meta.txt"`) automatically.
 
-Should be: 
-
-`folder="20220919T102058_esampayo"`, and the function will locate the correct txt file (`"...seqs.absolute.abund_and_meta.txt"`) automatically from there.
-
+\*\* both `drop_samples` and `drop_seqs` accept either full names or partial matches for seqs and samples. Be careful to specify the exact full sample name or it will filter by a partial match.
 
 ## extract_seqs examples
 
 ### i) get the absolute abundance of all sequences
 
 ```{r}
+
 tmp <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="absolute")
 
 tmp[1:5,1:10] # show first 5 cols, 10 rows
@@ -126,29 +75,57 @@ round(tmp[1:5,1:10],3) # show first 5 cols, 10 rows, round to 3 decimal places
 
 ### iv) remove samples with \<100 seqs in total:
 
-The cutoff threshold by default is 1000 seqs, changing it here manually will lower this threshold to 100 seqs
+The threshold threshold by default is 1000 seqs, changing it here manually will lower this threshold to 100 seqs
 
 ```{r}
-tmp <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", cutoff=100)
+tmp <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", threshold=100)
 
 round(tmp[1:5,1:10],3) # show first 5 cols, 10 rows, round to 3 decimal places
 ```
 
-### v) show removed samples:
+### iv) remove samples with \<100 seqs in total:
 
-The default setting is `silent=TRUE`, set to `FALSE` to print removed sample names below the cutoff
+The threshold threshold by default is 1000 seqs, changing it here manually will lower this threshold to 100 seqs
 
 ```{r}
-tmp <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", cutoff=100, silent=FALSE)
+tmp <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", threshold=100)
+
+round(tmp[1:5,1:10],3) # show first 5 cols, 10 rows, round to 3 decimal places
+```
+
+### v) drop samples containing "OT" and "H18"
+
+The threshold threshold by default is 1000 seqs, changing it here manually will lower this threshold to 100 seqs
+
+```{r}
+tmp <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", drop_samples = c("OT", "H18"), silent=FALSE)
+
+round(tmp[1:5,1:10],3) # show first 5 cols, 10 rows, round to 3 decimal places
+```
+
+### vi) drop seqs containing "OT" and "H18"
+
+The default setting is `silent=TRUE`, set to `FALSE` to print removed sample names below the threshold
+
+```{r}
+tmp <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", drop_seqs=c("X", "G"), silent=FALSE)
+
+round(tmp[1:5,1:10],3) # show first 5 cols, 10 rows, round to 3 decimal places
+```
+
+### vi) drop seqs and samples, list removed names
+
+The default setting is `silent=TRUE`, set to `FALSE` to print removed sample names below the threshold
+
+```{r}
+tmp <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", drop_seqs=c("X", "G"), drop_samples = c("OT", "H18"), silent=FALSE)
 
 round(tmp[1:5,1:10],3) # show first 5 cols, 10 rows, round to 3 decimal places
 ```
 
 ## example: Plot stacked bar graph of sequences (ggplot)
 
-
-To extract in a long format (like `pivot-longer`), use `extract_seqs_long`. 
-It's identical to `extract_seqs`, just returns in a long rather than wide format.
+To extract in a long format (like `pivot-longer`), use `extract_seqs_long`. It's identical to `extract_seqs`, just returns in a long rather than wide format.
 
 ```{r, fig.width=10, fig.height=7}
 # extract seqs
@@ -167,7 +144,7 @@ ggplot() + theme_bw() +
 Second example: use `extract_seqs` with vegan to get dendrogram and clusters.
 
 ```{r, fig.width=8, fig.height=7}
-cluster.C <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", cutoff=100) 
+cluster.C <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", threshold=100) 
 
 library(vegan)
 library(tibble)
@@ -191,10 +168,10 @@ plot(cluster.C.dend, main="Postmed C sequences >100 seqs", ylab="Bray Curtis")
 
 ```
 
-Now tune the noise with cutoff:
+Now tune the noise with threshold:
 
 ```{r, fig.width=10, fig.height=5}
-cluster.C <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", cutoff=10000) 
+cluster.C <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", threshold=10000) 
 
 cluster.C.dist <- vegdist(cluster.C, method ="bray")
 cluster.C.km <- cascadeKM(cluster.C.dist, 1, 10, iter = 5000)
