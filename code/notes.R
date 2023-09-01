@@ -17,14 +17,14 @@ library(tidyverse)
 library(ggridges)
 
 
-plot_data <- extract_seqs_long(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", cutoff=1000, clade="C") |>
+plot_data <- extract_seqs_long(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative",  clade="C") |>
   mutate(numeric.ID = as.numeric((as.factor(seq.ID)))) |>
   mutate(sample.ID = as.factor(sample.ID)) |>
 #  filter(abundance>0.01) |>
   complete(seq.ID, sample.ID) |>
   filter(sample.ID %in% levels(sample.ID)[1:10]) |>
   mutate(numeric.ID = as.numeric((as.factor(seq.ID)))) |>
-  replace_na(list(abundance = 0))
+  replace_na(list(abundance = 0)) |> filter(sample.ID=="H00B06_ES22OT")
 
 
 ggplot() + theme_ridges() + ylab("") +
