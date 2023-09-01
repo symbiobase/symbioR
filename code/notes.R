@@ -24,12 +24,18 @@ plot_data <- extract_seqs_long(folder="/Users/rof011/symbiodinium/20220919T10205
   complete(seq.ID, sample.ID) |>
   filter(sample.ID %in% levels(sample.ID)[1:10]) |>
   mutate(numeric.ID = as.numeric((as.factor(seq.ID)))) |>
-  replace_na(list(abundance = 0)) |> filter(sample.ID=="H00B06_ES22OT")
+  replace_na(list(abundance = 0)) |> filter(sample.ID=="H00B06_ES22OT") %>%
+  do(sample_n(., size = nrow(.)))
+
+plot_data2 <- plot_data
+plot_data2$numeric.ID <- sample(plot_data2$numeric.ID)
 
 
 ggplot() + theme_ridges() + ylab("") +
   geom_ridgeline(data=plot_data, aes(x = numeric.ID, y = sample.ID, height = abundance*2, fill=sample.ID), alpha=0.4, show.legend=FALSE)
 
+ggplot() + theme_ridges() + ylab("") +
+  geom_ridgeline(data=plot_data2, aes(x = numeric.ID, y = sample.ID, height = abundance*2, fill=sample.ID), alpha=0.4, show.legend=FALSE)
 
 
 tmp <- plot_data |> filter(sample.ID == "H00B06_ES22OT")

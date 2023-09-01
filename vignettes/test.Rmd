@@ -21,7 +21,7 @@ Example `coralseed` scenario from Watsons North, an sheltered forereef site at L
 ```{r mapoutput, fig.width=8, fig.height=8, fig.align = 'center', warning=FALSE, message=FALSE}
 
 #devtools::install_github("marine-ecologist/coralseed",  lib = "/Users/rof011/coralseed")
-devtools::document("/Users/rof011/coralseed")
+devtools::install("/Users/rof011/coralseed")
 
 library(coralseed)
 library(ggplot2)
