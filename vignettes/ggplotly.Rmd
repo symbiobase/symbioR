@@ -1,0 +1,53 @@
+---
+title: "Vignette Title"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r, fig.width=8, fig.height=6}
+
+
+library(symportalfunctions)
+library(tidyverse)
+library(ggridges)
+
+
+plot_data <- extract_seqs_long(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative",  clade="C") 
+
+colour.seqs <- extract_plot_colors("/Users/rof011/symbiodinium/20220919T102058_esampayo") # get plot colors from symportal folder, no need to every subsample
+its2.type.names <- extract_its2_names("/Users/rof011/symbiodinium/20220919T102058_esampayo")
+
+
+ggplot() + theme_bw() +
+  geom_bar(data=plot_data, aes(fill=seq.ID, y=abundance, x=sample.ID), color="black", linewidth=0.1,
+           position = position_fill(reverse = TRUE), show.legend=FALSE, stat="identity") +
+  theme(legend.position = "bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  scale_fill_manual(values = colour.seqs) +
+  geom_text(data=its2.type.names, aes(x=sample_name, y=1.5, label=UID),size=2, angle=90)
+
+
+```
+
+
+```{r}
+
+
+
+
+```
+
+
+
+

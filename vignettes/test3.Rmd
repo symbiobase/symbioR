@@ -1,0 +1,49 @@
+---
+title: "Themed dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    theme:
+      bg: "#101010"
+      fg: "#FDF7F7" 
+      primary: "#ED79F9"
+      base_font:
+        google: Prompt
+      code_font:
+        google: JetBrains Mono
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+# Install thematic and un-comment for themed static plots (i.e., ggplot2)
+# thematic::thematic_rmd()
+```
+
+```{r}
+library(shiny)
+library(ggplot2)
+library(dplyr)
+library(plotly)
+library(shiny)
+library(ggplot2)
+
+ui <- fluidPage(
+  actionButton("saveBtn", "Save Plot")
+)
+
+server <- function(input, output, session) {
+  observeEvent(input$saveBtn, {
+    tryCatch({
+      ggsave(filename = "/Users/rof011/symportalfunctions/test.png", 
+             plot = ggplot(mtcars, aes(mpg, wt)) + geom_point())
+      showNotification("Plot saved successfully!", type = "message")
+    }, error = function(e) {
+      showNotification(paste("An error occurred:", e$message), type = "error")
+    })
+  })
+}
+
+shinyApp(ui, server)
+```
