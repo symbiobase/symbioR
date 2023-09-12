@@ -15,7 +15,3 @@ its_profile A data.frame of ITS profiles for each sample.ID
 \description{
 Function to extract its2 profiles from Symportal
 }
-\examples{
-
-tmp <- extract_its2_profile(folder="/Users/rof011/Symbiodinium/20220919T102058_esampayo/")
-}

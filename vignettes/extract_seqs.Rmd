@@ -18,9 +18,9 @@ knitr::opts_chunk$set(
 library(tidyverse)
 library(ggplot2)
 library(devtools)
-devtools::load_all() 
-#install("/Users/rof011/symportalfunctions")
-#library(symportalfunctions)
+library(symportalfunctions)
+#library(lattice)
+
 ```
 
 # extract_seqs
@@ -146,11 +146,12 @@ Second example: use `extract_seqs` with vegan to get dendrogram and clusters.
 ```{r, fig.width=8, fig.height=7}
 cluster.C <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", threshold=100) 
 
+library(lattice)
 library(vegan)
 library(tibble)
 
-cluster.C.dist <- vegdist(cluster.C, method ="bray")
-cluster.C.km <- cascadeKM(cluster.C.dist, 1, 10, iter = 5000)
+cluster.C.dist <- vegan::vegdist(cluster.C, method ="bray")
+cluster.C.km <- vegan::cascadeKM(cluster.C.dist, 1, 10, iter = 5000)
 
 cluster.C.km.grps <- as.data.frame(cluster.C.km[["partition"]]) %>% 
   rownames_to_column(var="sample.ID")

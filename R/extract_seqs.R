@@ -9,12 +9,6 @@
 #' @param silent defaults to TRUE, if FALSE then prints a list of removed sample names
 #' @export
 #' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
-#' @examples
-#'
-#' # tmp <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="absolute", clade=c("C", "D"))
-#' #
-#' # tmp2 <- extract_seqs(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", threshold=100)
-#'
 
 extract_seqs <- function(folder, type = "relative", clade = LETTERS[1:10], threshold = 1000, drop_samples = NULL, drop_seqs = NULL, silent = TRUE) {
   # get matches with dropped samples:

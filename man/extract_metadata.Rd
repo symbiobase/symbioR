@@ -4,13 +4,7 @@
 \alias{extract_metadata}
 \title{Function to extract metadata from symportal output}
 \usage{
-extract_metadata(
-  folder,
-  type = "relative",
-  clade = LETTERS[1:10],
-  cutoff = 1000,
-  silent = TRUE
-)
+extract_metadata(folder)
 }
 \arguments{
 \item{folder}{location of the root Symportal output}
@@ -20,8 +14,4 @@ A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or ab
 }
 \description{
 Function to extract metadata from symportal output
-}
-\examples{
-
-tmp <- extract_metadata(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo")
 }

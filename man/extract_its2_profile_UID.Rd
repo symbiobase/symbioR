@@ -15,7 +15,3 @@ its_profile_UID A data.frame of ITS profiles for each UID
 \description{
 Function to extract its2 profile UIDs from Symportal
 }
-\examples{
-
-tmp <- extract_its2_profile_UID(folder="/Users/rof011/Symbiodinium/20220919T102058_esampayo/")
-}

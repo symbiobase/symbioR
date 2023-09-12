@@ -15,10 +15,3 @@ its_profile A data.frame of ITS profiles for each sample.ID
 \description{
 Function to extract colors for plots from Symportal
 }
-\examples{
-
-tmp <- extract_plot_colors(folder="/Users/rof011/Symbiodinium/20210805T112901")
-
-
-
-}

@@ -4,12 +4,7 @@
 #' @param print.seqs prints unique seqs output
 #' @export
 #' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
-#' @examples
-#'
-#' tmp <- extract_its2_profile_seqs(folder = "/Users/rof011/symbiodinium/20220919T102058_esampayo", print.seqs = TRUE)
-#'
-#' tmp <- extract_its2_profile_seqs(folder = "/Users/rof011/symbiodinium/20220919T102058_esampayo", print.seqs = TRUE)
-#'
+
 extract_its2_profile_split <- function(folder, print.seqs = FALSE) {
   its2.profile.tmp <- symportalfunctions::extract_its2_profile(sym_folder)
 

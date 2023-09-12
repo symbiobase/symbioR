@@ -3,11 +3,7 @@
 #' @param folder location of the root Symportal output
 #' @export
 #' @return its_profile A data.frame of ITS profiles for each sample.ID
-#' @examples
-#'
-#' tmp <- extract_its2_names(  folder="/Users/rof011/Symbiodinium/20210805T112901")
-#'
-#'
+
 #'
 extract_its2_names <- function(folder) {
 

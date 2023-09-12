@@ -12,12 +12,6 @@
 #' @param silent defaults to TRUE, if FALSE then prints a list of removed sample names
 #' @export
 #' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
-#' @examples
-#'
-#' tmp <- extract_seqs_long(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="absolute", clade=c("C", "D"))
-#'
-#' tmp2 <- extract_seqs_long(folder="/Users/rof011/symbiodinium/20220919T102058_esampayo", type="relative", clade="C", threshold=100)
-#'
 
 
 extract_seqs_long <-  function(folder, type = "relative", clade = LETTERS[1:10], threshold = 1000, drop_samples = NULL, drop_seqs = NULL, silent = TRUE) {
@@ -82,16 +76,14 @@ extract_seqs_long <-  function(folder, type = "relative", clade = LETTERS[1:10],
   absolute <- absolute %>%
     tibble::rownames_to_column("sample.ID") %>%
     tidyr::pivot_longer(cols = -sample.ID, names_to = "seq.ID", values_to = "abundance") %>%
-    filter(abundance>0.0001) %>%
-    mutate(seq.ID = str_replace(seq.ID, "^X", "")) # drop X if first in seq.ID
+    dplyr::filter(abundance>0.0001) %>%
+    dplyr::mutate(seq.ID = stringr::str_replace(seq.ID, "^X", "")) # drop X if first in seq.ID
 
   relative <- relative %>%
     tibble::rownames_to_column("sample.ID") %>%
     tidyr::pivot_longer(cols = -sample.ID, names_to = "seq.ID", values_to = "abundance") %>%
-    filter(abundance>0.0001) %>%
-    mutate(seq.ID = str_replace(seq.ID, "^X", "")) # drop X if first in seq.ID
-
-
+    dplyr::filter(abundance>0.0001) %>%
+    dplyr::mutate(seq.ID = stringr::str_replace(seq.ID, "^X", "")) # drop X if first in seq.ID
 
   # return functions:
   if (type == "absolute") {
@@ -99,13 +91,6 @@ extract_seqs_long <-  function(folder, type = "relative", clade = LETTERS[1:10],
   } else if (type == "relative") {
     return(relative)
   }
-
-
-
-
-
-
-
 
   if (type == "absolute") {
     return(absolute)

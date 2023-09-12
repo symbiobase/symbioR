@@ -4,14 +4,16 @@ Version: 0.2.0
 Authors@R: 
     person("George", "Roff", , "George.Roff@csiro.au", role = c("aut", "cre"))
 Description: Collection of functions to extract data from Symportal.
-License: MIT + file LICENSE
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 URL: https://marine-ecologist.github.io/symportalfunctions/
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat (>= 3.0.0)
 Imports:
     magrittr
 VignetteBuilder: knitr
+Config/testthat/edition: 3

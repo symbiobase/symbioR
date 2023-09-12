@@ -17,10 +17,3 @@ A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or ab
 \description{
 Function to extract seqs from symportal output in long format
 }
-\examples{
-
-tmp <- extract_its2_profile_seqs(folder = "/Users/rof011/symbiodinium/20220919T102058_esampayo", print.seqs = TRUE)
-
-tmp <- extract_its2_profile_seqs(folder = "/Users/rof011/symbiodinium/20220919T102058_esampayo", print.seqs = TRUE)
-
-}

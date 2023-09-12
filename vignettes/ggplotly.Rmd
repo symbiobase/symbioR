@@ -1,10 +1,9 @@
 ---
-title: "Vignette Title"
-author: "Vignette Author"
+title: "ggplot test"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{ggplot test}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,6 +14,8 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
+Test ggplot with `extract_seqs_long`, `extract_plot_colors`, `extract_its2_names`
 
 ```{r, fig.width=8, fig.height=6}
 
@@ -31,10 +32,10 @@ its2.type.names <- extract_its2_names("/Users/rof011/symbiodinium/20220919T10205
 
 
 ggplot() + theme_bw() +
-  geom_bar(data=plot_data, aes(fill=seq.ID, y=abundance, x=sample.ID), color="black", linewidth=0.1,
+  geom_bar(data=plot_data, aes(fill=seq.ID, y=abundance, x=sample.ID, group=abundance), color="black", linewidth=0.1,
            position = position_fill(reverse = TRUE), show.legend=FALSE, stat="identity") +
   theme(legend.position = "bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
-  scale_fill_manual(values = colour.seqs) +
+  scale_fill_manual(values = colour.seqs) + scale_y_reverse() +
   geom_text(data=its2.type.names, aes(x=sample_name, y=1.5, label=UID),size=2, angle=90)
 
 
