@@ -2,8 +2,6 @@
 #'
 #' @export
 
-library(shiny)
-
 seqs_viewer <- function() {
   appDir <- system.file("shiny-examples", "seqs-viewer", package = "symportalfunctions")
   if (appDir == "") {
