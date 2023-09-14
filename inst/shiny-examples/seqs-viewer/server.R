@@ -4,19 +4,39 @@ library(ggplot2)
 library(ggridges)
 library(plotly)
 library(shiny)
+library(shinyFiles)
 
 server <- function(input, output, session) {
   # Initialize reactive values
   data_vals <- reactiveVal(list(plot_data = NULL, colour.seqs = NULL, its2.type.names = NULL))
   greyFilterActivated <- reactiveVal(FALSE) # by default, the grey filter is off
 
-  observeEvent(input$folderInput, {
-    new_folder <- isolate(input$folderInput)
-    plot_data_new <- extract_seqs_long(new_folder, type = "absolute")
-    colour.seqs_new <- extract_plot_colors(new_folder)
-    its2.type.names_new <- extract_its2_names(new_folder)
-    data_vals(list(plot_data = plot_data_new, colour.seqs = colour.seqs_new, its2.type.names = its2.type.names_new))
+
+  volumes <- shinyFiles::getVolumes()()
+
+observeEvent(input$folderInput, {
+
+  shinyDirChoose(input, 'folderInput', roots=volumes, filetypes=c('', 'txt'))
+  folder <- shinyFiles::parseDirPath(volumes, input$folderInput)
+    # Check if folder has been properly selected
+    if (length(folder) > 0) {
+      folder_path <- as.character(folder)
+      print(folder_path) # For debugging
+
+      plot_data_new <- extract_seqs_long(folder_path, type = "absolute")
+      colour.seqs_new <- extract_plot_colors(folder_path)
+      its2.type.names_new <- extract_its2_names(folder_path)
+      data_vals(list(plot_data = plot_data_new, colour.seqs = colour.seqs_new, its2.type.names = its2.type.names_new))
+
+    } else {
+      # Display a notification if there's an issue with folder selection
+      showNotification("There was an issue with the folder selection. Please try again.", type = "error")
+    }
   })
+
+
+
+
 
   output$seqID_ui <- renderUI({
     selectInput("seqID", "Select seq.ID:",
@@ -43,12 +63,14 @@ server <- function(input, output, session) {
     print(input$seqID)
   })
 
-  data_reactive <- reactive({
+data_reactive <- reactive({
     req(data_vals()$plot_data)
     data_vals()
-  })
+})
+
 
   reactivePlot <- reactive({
+    req(data_reactive()$plot_data)
     filtered_data <- data_reactive()$plot_data
 
     # Your data processing code
@@ -174,7 +196,9 @@ server <- function(input, output, session) {
   })
 
   output$plotUI <- renderPlotly({
+    req(data_reactive()$plot_data) # Make sure there's data before plotting
     p <- reactivePlot()
     ggplotly(p)
   })
+
 }

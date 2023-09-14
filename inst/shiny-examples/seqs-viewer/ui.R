@@ -1,6 +1,7 @@
 library(shiny)
 library(flexdashboard)
 library(plotly)
+library(shinyFiles)
 
 fluidPage(
   titlePanel(tags$b("seq*sample")),
@@ -9,36 +10,46 @@ fluidPage(
       tags$head(tags$style(".main-panel {height: 800px; overflow-y: auto;}")), # Sets the height
 
       tags$style(HTML("
-        .navbar-header .navbar-brand {
-          font-size: 36px;
-        .sidebar {
-          background-color: #f7f7f7;
-          padding: 20px;
-          border-right: 1px solid #e1e1e1;
-        }
-        .shiny-input-container {
-          margin-bottom: 40px;
-        }
-        label {
-          font-size: 20px;
-          font-weight: bold;
-          color: #555;
-          border-bottom: 1px solid #e1e1e1;
-        }
-        #absoluteBtn {
-            background-color: red;
-            padding: 10px 15px;
-            margin-left: 10px;
-        }
-        #relativeBtn {
-            background-color: blue;
-            padding: 10px 15px;
-            margin-right: 10px;
-        }
-        .shiny-notification {
-          font-size: 30px;
-        }
-      ")),
+    .col-sm-4 {
+      width: 25%;
+    }
+    .col-sm-8 {
+      width: 75%;
+    }
+  .navbar-header .navbar-brand {
+    font-size: 36px;
+  }
+  .sidebar {
+    background-color: #e6ffff;
+    padding: 20px;
+    width: 300px !important;
+    max-width: 300px;
+    border-right: 1px solid #e1e1e1;
+  }
+  .shiny-input-container {
+    margin-bottom: 40px;
+  }
+  label {
+    font-size: 20px;
+    font-weight: bold;
+    color: #555;
+    border-bottom: 1px solid #e1e1e1;
+  }
+  #absoluteBtn {
+      background-color: #fff2cc;
+      padding: 10px 15px;
+      margin-left: 10px;
+  }
+  #relativeBtn {
+      background-color: #cce6ff;
+      padding: 10px 15px;
+      margin-right: 10px;
+  }
+  .shiny-notification {
+    font-size: 30px;
+  }
+"))
+,
 
       #-------------------- Absolute or relative --------------------------@
       div(
@@ -47,8 +58,9 @@ fluidPage(
         style = "display: inline-block;"
       ),
       #-------------------- Specify folder --------------------------@
-      tags$h3("Select folder"),
-      textInput("folderInput", "Specify base Symportal folder:", value = "/Users/rof011/symbiodinium/20220919T102058_esampayo"),
+      tags$h3(""),
+      shinyDirButton("folderInput", "Choose a directory", "Please select a directory", FALSE),
+
 
       #-------------------- Set threshold --------------------------@
       tags$h3("Set threshold"),
