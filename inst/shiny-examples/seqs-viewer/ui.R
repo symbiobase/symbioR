@@ -17,7 +17,22 @@ fluidPage(
       width: 75%;
     }
   .navbar-header .navbar-brand {
-    font-size: 36px;
+    font-size: 12px;
+  }
+  h2 {
+    font-size: 22px;
+    font-weight: bold;
+  }
+  h3 {
+    font-size: 14px;
+    font-weight: bold;
+  }
+   label {
+    font-size: 11px;
+    color: #555;
+    #border-bottom: 3px solid #e1e1e1;
+    border-top: 3px solid #e1e1e1;
+
   }
   .sidebar {
     background-color: #e6ffff;
@@ -29,19 +44,27 @@ fluidPage(
   .shiny-input-container {
     margin-bottom: 40px;
   }
-  label {
-    font-size: 20px;
-    font-weight: bold;
-    color: #555;
-    border-bottom: 1px solid #e1e1e1;
+ #toggleFacetBtn {
+      background-color: #e3c7ff;
+      font-size: 9px;
+      padding: 10px 15px;
+      #margin-left: 10px;
   }
   #absoluteBtn {
       background-color: #fff2cc;
+      font-size: 9px;
       padding: 10px 15px;
-      margin-left: 10px;
+      #margin-left: 10px;
   }
   #relativeBtn {
       background-color: #cce6ff;
+      font-size: 9px;
+      padding: 10px 15px;
+      #margin-right: 10px;
+  }
+    #folderInput {
+      background-color: #a3ffed;
+      font-size: 9px;
       padding: 10px 15px;
       margin-right: 10px;
   }
@@ -55,11 +78,12 @@ fluidPage(
       div(
         actionButton("relativeBtn", "Relative"),
         actionButton("absoluteBtn", "Absolute"),
+        actionButton("toggleFacetBtn", "Facets"),
         style = "display: inline-block;"
       ),
       #-------------------- Specify folder --------------------------@
       tags$h3(""),
-      shinyDirButton("folderInput", "Choose a directory", "Please select a directory", FALSE),
+      shinyDirButton("folderInput", "Directory", "Please select a directory", FALSE),
 
 
       #-------------------- Set threshold --------------------------@

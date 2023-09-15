@@ -10,9 +10,13 @@ server <- function(input, output, session) {
   # Initialize reactive values
   data_vals <- reactiveVal(list(plot_data = NULL, colour.seqs = NULL, its2.type.names = NULL))
   greyFilterActivated <- reactiveVal(FALSE) # by default, the grey filter is off
-
+  facetActivated <- reactiveVal(FALSE)
+  abundanceType <- reactiveVal("Relative") # default value
 
   volumes <- shinyFiles::getVolumes()()
+
+
+
 
 observeEvent(input$folderInput, {
 
@@ -36,6 +40,16 @@ observeEvent(input$folderInput, {
 
 
 
+output$plotUI <- renderPlotly({
+  req(data_reactive()$plot_data)
+  p <- reactivePlot()
+
+  # Adjusting height based on number of batches
+  number_of_batches <- length(unique(data_reactive()$plot_data$batch))
+  plot_height <- number_of_batches * 600  # You can adjust the multiplier based on your needs
+
+  ggplotly(p, height = plot_height)
+})
 
 
   output$seqID_ui <- renderUI({
@@ -89,7 +103,6 @@ data_reactive <- reactive({
       filtered_data <- filtered_data %>% filter(sample.ID %in% input$sample.ID)
     }
 
-
     if (nchar(input$minAbundance) > 0) {
       filtered_data <- filtered_data %>% filter(abundance > input$minAbundance)
     }
@@ -125,42 +138,84 @@ data_reactive <- reactive({
       ungroup() %>%
       mutate(fill_col = ifelse(greyFilterActivated() & cumulative_percentage <= (input$minGrey / 100), "grey", as.character(seq.ID)))
 
-    p <- ggplot() +
-      theme_bw()
 
-    if (abundanceType() == "Relative") {
-      p <- p + geom_bar(
-        data = filtered_data,
-        aes(
-          x = sample.ID, y = abundance,
-          fill = fill_col,
-          group = abundance
-        ),
-        color = "black", linewidth = 0.1, position = position_fill(reverse = TRUE),
-        show.legend = FALSE, stat = "identity"
-      ) + scale_y_reverse()
-    } else {
-      p <- p + geom_bar(
-        data = filtered_data,
-        aes(
-          x = sample.ID, y = abundance,
-          fill = fill_col,
-          group = abundance
-        ),
-        color = "black", linewidth = 0.1, show.legend = FALSE, stat = "identity"
+    #### add section here on sample
+
+    ####
+
+    if (nrow(filtered_data) > 0) {
+      # Create batches of 20 for sample.ID and add as a new factor level column
+      unique_samples <- unique(filtered_data$sample.ID)
+      batched_samples <- gl(ceiling(length(unique_samples) / 30), 30, labels = 1:ceiling(length(unique_samples) / 20))
+      sample_batches <- data.frame(sample.ID = unique_samples, panel = batched_samples[1:length(unique_samples)])
+      filtered_data <- left_join(filtered_data, sample_batches, by = "sample.ID")
+
+      p <- ggplot() + theme_bw()
+
+      if (facetActivated()) {
+        # Group samples into batches of 20
+        filtered_data <- filtered_data %>%
+          group_by(sample.ID) %>%
+          mutate(batch = ceiling(row_number() / 20)) %>%
+          ungroup()
+
+        p <- p +
+          facet_wrap(~panel, ncol = 1, scales="free_x")
+
+
+      } else {
+
+      }
+      if (abundanceType() == "Relative") {
+        p <- p + #facet_wrap(~panel, ncol=1, scales="free_x") +
+          geom_bar(
+          data = filtered_data,
+          aes(
+            x = sample.ID, y = abundance,
+            fill = fill_col,
+            group = abundance
+          ),
+          color = "black", linewidth = 0.1, position = position_fill(reverse = TRUE),
+          show.legend = FALSE, stat = "identity"
+        ) + scale_y_reverse()
+      } else {
+        p <- p + #facet_wrap(~panel, ncol=1, scales="free_x") +
+          geom_bar(
+          data = filtered_data,
+          aes(
+            x = sample.ID, y = abundance,
+            fill = fill_col,
+            group = abundance
+          ),
+          color = "black", linewidth = 0.1, show.legend = FALSE, stat = "identity"
+        )
+      }
+
+
+
+
+      color_palette <- data_reactive()$colour.seqs
+      color_palette["grey"] <- "grey"
+
+      p <- p + scale_fill_manual(values = color_palette) +
+#       theme(legend.position = "bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+        theme(legend.position = "bottom", axis.text.x = element_blank(),
+        strip.background = element_blank(), strip.text.x = element_blank()
       )
+    } else {
+      p <- ggplot() + theme_bw() +
+        annotate("text", x = 1, y = 1, label = "No data available", size = 5, colour = "red") +
+        theme_void()
     }
-
-    color_palette <- data_reactive()$colour.seqs
-    color_palette["grey"] <- "grey"
-
-    p <- p + scale_fill_manual(values = color_palette) +
-      theme(legend.position = "bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
     return(p)
   })
 
-  abundanceType <- reactiveVal("Relative") # default value
+
+  observeEvent(input$toggleFacetBtn, {
+    facetActivated(!facetActivated()) # Toggle the state
+  })
+
 
   observeEvent(input$relativeBtn, {
     abundanceType("Relative")
@@ -192,6 +247,7 @@ data_reactive <- reactive({
       error = function(e) {
         showNotification(paste("An error occurred with the following warning:", e$message, "check the file directory and image type (.jpg, .pdf, .png) and width/height are correctly specified"), type = "error")
       }
+
     )
   })
 
