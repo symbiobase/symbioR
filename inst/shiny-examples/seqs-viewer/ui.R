@@ -7,15 +7,15 @@ fluidPage(
   titlePanel(tags$b("seq*sample")),
   sidebarLayout(
     sidebarPanel(
-      tags$head(tags$style(".main-panel {height: 800px; overflow-y: auto;}")), # Sets the height
+      tags$head(tags$style(".main-panel {height: 1200px; overflow-y: auto;}")), # Sets the height
 
       tags$style(HTML("
     .col-sm-4 {
-      width: 25%;
+      width: 300px;
     }
-    .col-sm-8 {
-      width: 75%;
-    }
+    # .col-sm-8 {
+    #   width: 60%;
+    # }
   .navbar-header .navbar-brand {
     font-size: 12px;
   }
@@ -47,23 +47,23 @@ fluidPage(
  #toggleFacetBtn {
       background-color: #e3c7ff;
       font-size: 9px;
-      padding: 10px 15px;
+      padding: 5px 5;
       #margin-left: 10px;
   }
   #absoluteBtn {
       background-color: #fff2cc;
       font-size: 9px;
-      padding: 10px 15px;
+      padding: 5px 5px;
       #margin-left: 10px;
   }
   #relativeBtn {
       background-color: #cce6ff;
       font-size: 9px;
-      padding: 10px 15px;
+      padding: 5px 5px;
       #margin-right: 10px;
   }
     #folderInput {
-      background-color: #a3ffed;
+      background-color: #a9a9a9;
       font-size: 9px;
       padding: 10px 15px;
       margin-right: 10px;
@@ -87,25 +87,40 @@ fluidPage(
 
 
       #-------------------- Set threshold --------------------------@
+div(
+  style = "border: 1px solid black; padding: 6px; border-radius: 6px;", # CSS for border and padding
+
+
       tags$h3("Set threshold"),
-      numericInput("minAbundance", "Lower cutoff for seq abundance:", value = 0, min = 0),
+      numericInput("minAbundance", "Lower cutoff for seqs (abundance):", value = 0, min = 0),
       div(
         style = "display: inline-block; width: 40%;",
-        numericInput("minGrey", "Lower cutoff for Grey Switch:", value = 0, min = 0),
+        numericInput("minGrey", "Lower cutoff for Grey Switch (%):", value = 0, min = 0),
       ),
       div(
         style = "display: inline-block; width: 40%;",
         actionButton("toggleGrey", "Grey Switch")
       ),
-      #-------------------- SeqID filter --------------------------@
+),
+div(style = "", tags$h4(""), ),
+
+      #-------------------- SeqID / SampleID filter --------------------------@
+div(
+  style = "border: 1px solid black; padding: 6px; border-radius: 6px;", # CSS for border and padding
+
       tags$h3("Filter by seqID"),
       uiOutput("seqID_ui"),
       textInput("seqIDPattern", "Include seq.IDs (comma separated):", value = ""),
-      #-------------------- SampleID --------------------------@
       tags$h3("Filter by Sample"),
       uiOutput("sampleID_ui"),
       textInput("excludeSampleIDPatterns", "Exclude sample.IDs (comma seperated)", value = ""),
+),
+div(style = "", tags$h4(""), ),
+
       #-------------------- Save Functions --------------------------@
+div(
+  style = "border: 1px solid black; padding: 6px; border-radius: 6px;", # CSS for border and padding
+
       tags$h3("Save Plot"),
       textInput("filenameInput", "Filename:", value = "my_plot.png"),
       div(
@@ -119,6 +134,8 @@ fluidPage(
       textInput("saveFolderInput", "Set folder path:", value = "/Users/rof011/symportalfunctions"),
       actionButton("savePlotBtn", "Save Plot")
     ),
+),
+
     #-------------------- plotly --------------------------@
     mainPanel(
       plotlyOutput("plotUI", height = "95vh")

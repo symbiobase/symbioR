@@ -1,0 +1,118 @@
+---
+title: "Worfklow 1"
+#author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r}
+
+devtools::load_all()
+library(tidyverse)
+#library(coralseed)
+```
+
+## 1) Importing symportal files
+
+#### Set folder path:
+
+```{r}
+folder_path <- ("/Volumes/Macintosh HD/Users/rof011/symbiodinium/20230120T102936_esampayo") 
+```
+
+#### a)  import metadata file
+
+Extract metadata. Add options here? 
+```{r}
+metadata_all <- extract_metadata(folder_path)
+metadata <- extract_metadata(folder_path) %>% dplyr::select("sample.ID", "sample_uid", "host_genus", "host_species")
+```
+
+#### b)  import symportal postmed seqs
+Only imported the raw sequences, match these with metadata using left_join and sample.ID as needed
+either `type="absolute"` or `type="relative"`
+
+```{r}
+its2_profiles <- extract_its2_profile(folder_path)
+its2_profiles <- extract_its2_profile(folder_path) %>% left_join(metadata,., by="sample.ID")
+
+```
+
+#### c)  import symportal profiles 
+Only imported the profiles, match these with metadata using left_join and sample.ID as needed
+
+```{r}
+its2_profile_uid <- extract_its2_profile_UID(folder_path)
+its2_profile_uid <- extract_its2_profile_UID(folder_path) %>% left_join(metadata,., by="sample.ID")
+
+```
+
+#### d)  import sequences
+import in wide or long format
+
+```{r}
+seqs <- extract_seqs_wide(folder_path)
+seqs <- extract_seqs_long(folder_path)
+
+seqs <- extract_seqs_long(folder_path) %>% left_join(metadata,., by="sample.ID")
+
+```
+
+#### e)  import fasta files
+either premed or postmed
+```{r}
+fastas <- extract_fasta(folder_path, type="premed")
+fastas <- extract_fasta(folder_path, type="postmed")
+```
+
+do we need seperate imports for clade types?
+
+```{r}
+fastas <- extract_fasta(folder_path, type="postmed") # 533 seqs
+sym_fasta_c <- ape::read.dna(paste0(folder_path,"/between_sample_distances/C/clade_C_seqs.aligned.fasta"), format = "fasta") # 448 seqs
+sym_fasta_d <- ape::read.dna(paste0(folder_path,"/between_sample_distances/D/clade_D_seqs.aligned.fasta"), format = "fasta") # 69 seqs
+
+# 517 seqs between c and d? 
+```
+
+
+## 3) Quality control 
+
+(additional to the QC incorporated by SymPortal itself)
+- remove samples below certain sequence abundance < set filter sequence abundance
+    (function 'remove_samples_by_seq_abund')
+- remove samples with unassigned profiles 
+(caution: may stem from low sequence abundance OR (as yet) insufficient symportal matches) 
+    (function 'remove_samples_by_profile')
+- remove samples selectively based on their names 
+(reasons can be e.g. suspected contamination, wrong sample inclusion, etc) 
+    (function 'remove_samples_by_name')
+
+
+probably easier just to tidyverse this? 
+
+```{r eval=FALSE, include=TRUE}
+
+# drop samples with less than 100 abundance
+seqs <- extract_seqs_long(folder_path, type="absolute") %>% filter(abundance >100)
+
+# drop samples by name
+seqs <- extract_seqs_long(folder_path, type="absolute") %>% filter(!sample.ID %in% c("AU18_0457", "AU18_0359"))
+
+
+```
+
+OR
+
+we can include it in the main function, e.g. 

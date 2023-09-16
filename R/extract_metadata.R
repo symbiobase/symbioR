@@ -11,7 +11,8 @@ extract_metadata <- function(folder) {
   file_list <- list.files(path = folder, pattern = "seqs.absolute.abund_and_meta.txt", include.dirs = TRUE, recursive = TRUE)
 
   metadata <- read.delim(paste0(folder, "/", file_list)) %>%
-    dplyr::select(sample_name, 1:39)
+    dplyr::select(sample_name, 1:39) |>
+    dplyr::rename(sample.ID = sample_name)
   return(metadata)
 
 }

@@ -7,16 +7,19 @@ library(shiny)
 library(shinyFiles)
 
 server <- function(input, output, session) {
-  # Initialize reactive values
+
+#-------------------- Initialize reactive values --------------------------@
+
   data_vals <- reactiveVal(list(plot_data = NULL, colour.seqs = NULL, its2.type.names = NULL))
   greyFilterActivated <- reactiveVal(FALSE) # by default, the grey filter is off
   facetActivated <- reactiveVal(FALSE)
   abundanceType <- reactiveVal("Relative") # default value
 
+#-------------------- Get shiny volumes --------------------------@
+
   volumes <- shinyFiles::getVolumes()()
 
-
-
+#-------------------- Folder input --------------------------@
 
 observeEvent(input$folderInput, {
 
@@ -28,9 +31,10 @@ observeEvent(input$folderInput, {
       print(folder_path) # For debugging
 
       plot_data_new <- extract_seqs_long(folder_path, type = "absolute")
+      plot_data_new2 <- extract_seqs(folder_path, type = "absolute")
       colour.seqs_new <- extract_plot_colors(folder_path)
       its2.type.names_new <- extract_its2_names(folder_path)
-      data_vals(list(plot_data = plot_data_new, colour.seqs = colour.seqs_new, its2.type.names = its2.type.names_new))
+      data_vals(list(plot_data = plot_data_new, plot_data_2 = plot_data_new2, colour.seqs = colour.seqs_new, its2.type.names = its2.type.names_new))
 
     } else {
       # Display a notification if there's an issue with folder selection
@@ -39,25 +43,20 @@ observeEvent(input$folderInput, {
   })
 
 
+  #-------------------- plot heights --------------------------@
 
-output$plotUI <- renderPlotly({
-  req(data_reactive()$plot_data)
-  p <- reactivePlot()
+  output$plotUI <- renderPlotly({
+    req(data_reactive()$plot_data)
+    p <- reactivePlot()
 
-  # Adjusting height based on number of batches
-  number_of_batches <- length(unique(data_reactive()$plot_data$batch))
-  plot_height <- number_of_batches * 600  # You can adjust the multiplier based on your needs
+    # Adjusting height based on number of batches
+    number_of_batches <- length(unique(data_reactive()$plot_data$batch))
+    plot_height <- number_of_batches * 600  # You can adjust the multiplier based on your needs
 
-  ggplotly(p, height = plot_height)
-})
-
-
-  output$seqID_ui <- renderUI({
-    selectInput("seqID", "Select seq.ID:",
-      choices = c("ALL", unique(data_reactive()$plot_data$seq.ID)),
-      selected = "ALL", multiple = TRUE
-    )
+    ggplotly(p, height = plot_height)
   })
+
+  #-------------------- seq and sample.id --------------------------@
 
   output$seqID_ui <- renderUI({
     selectInput("seqID", "Select seq.ID:",
@@ -82,32 +81,29 @@ data_reactive <- reactive({
     data_vals()
 })
 
+#-------------------- reactivePlot --------------------------@
 
   reactivePlot <- reactive({
     req(data_reactive()$plot_data)
     filtered_data <- data_reactive()$plot_data
 
-    # Your data processing code
-
-    filtered_data <- data_reactive()$plot_data
-
+    #-------------------- filter by seq.ID --------------------------@
     if ("ALL" %in% input$seqID) {
       filtered_data <- data_reactive()$plot_data
     } else {
       filtered_data <- filtered_data %>% filter(seq.ID %in% input$seqID)
     }
-
+    #-------------------- filter by sample.ID --------------------------@
     if ("ALL" %in% input$sample.ID) {
       filtered_data <- filtered_data  # No changes
     } else {
       filtered_data <- filtered_data %>% filter(sample.ID %in% input$sample.ID)
     }
-
+    #-------------------- filter by minAbundance --------------------------@
     if (nchar(input$minAbundance) > 0) {
       filtered_data <- filtered_data %>% filter(abundance > input$minAbundance)
     }
-
-    # Pattern match for seqID
+    #-------------------- Pattern match for seq.ID --------------------------@
     if (nchar(input$seqIDPattern) > 0) {
       patterns <- unlist(strsplit(input$seqIDPattern, ",\\s*"))
       pattern_matches_list <- purrr::map(patterns, ~ grepl(.x, plot_data$seq.ID))
@@ -115,18 +111,18 @@ data_reactive <- reactive({
       pattern_filtered_data <- plot_data %>% filter(combined_matches)
       filtered_data <- dplyr::bind_rows(filtered_data, pattern_filtered_data)
     }
-
-    # Excluding based on sample.ID
+    #-------------------- Excluding based on sample.ID --------------------------@
     if (nchar(input$excludeSampleIDPatterns) > 0) {
       patterns <- unlist(strsplit(input$excludeSampleIDPatterns, ",\\s*"))
       pattern_matches_list <- purrr::map(patterns, ~ grepl(.x, filtered_data$sample.ID))
       combined_matches <- purrr::reduce(pattern_matches_list, `|`)
       filtered_data <- filtered_data %>% filter(!combined_matches)
     }
-
+    #-------------------- reorder factor levels --------------------------@
     filtered_data$seq.ID <- reorder(filtered_data$seq.ID, filtered_data$abundance)
     filtered_data$seq.ID <- factor(filtered_data$seq.ID, levels = rev(levels(filtered_data$seq.ID)))
 
+    #-------------------- add greyFilter  --------------------------@
     filtered_data <- filtered_data %>%
       group_by(sample.ID) %>%
       arrange(abundance) %>%
@@ -140,6 +136,7 @@ data_reactive <- reactive({
 
 
     #### add section here on sample
+
 
     ####
 
