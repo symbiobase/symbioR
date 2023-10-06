@@ -4,14 +4,16 @@
 \alias{extract_its2_profile}
 \title{Function to extract its2 profiles from Symportal}
 \usage{
-extract_its2_profile(folder)
+extract_its2_profile(folder, type = "absolute")
 }
 \arguments{
 \item{folder}{location of the root Symportal output}
+
+\item{type}{relative or absolute}
 }
 \value{
 its_profile A data.frame of ITS profiles for each sample.ID
 }
 \description{
-Function to extract its2 profiles from Symportal
+.  REDUNDANT - replaced by extract_postmed_seqs()
 }
