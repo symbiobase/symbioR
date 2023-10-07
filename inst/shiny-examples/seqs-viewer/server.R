@@ -52,7 +52,7 @@ server <- function(input, output, session) {
     p <- reactivePlot()
 
     # Adjusting height based on number of batches
-    number_of_batches <- length(unique(data_reactive()$plot_data$batch))
+    number_of_batches <- length(base::unique(data_reactive()$plot_data$batch))
     plot_height <- number_of_batches * 600 # You can adjust the multiplier based on your needs
 
     ggplotly(p, height = plot_height)
@@ -62,13 +62,13 @@ server <- function(input, output, session) {
 
   output$seqID_ui <- renderUI({
     selectInput("seqID", "Select seq.ID:",
-      choices = c("ALL", unique(data_reactive()$plot_data$seq.ID)),
+      choices = c("ALL", base::unique(data_reactive()$plot_data$seq.ID)),
       selected = "ALL", multiple = TRUE
     )
   })
   output$sampleID_ui <- renderUI({
     selectInput("sample.ID", "Select sample.ID:",
-      choices = c("ALL", unique(data_reactive()$plot_data$sample.ID)),
+      choices = c("ALL", base::unique(data_reactive()$plot_data$sample.ID)),
       selected = "ALL", multiple = TRUE
     )
   })
@@ -180,9 +180,9 @@ server <- function(input, output, session) {
 
     if (nrow(filtered_data) > 0) {
       # # Create batches of 20 for sample.ID and add as a new factor level column
-      # unique_samples <- unique(filtered_data$sample.ID)
-      # batched_samples <- gl(ceiling(length(unique_samples) / 30), 30, labels = 1:ceiling(length(unique_samples) / 20))
-      # sample_batches <- data.frame(sample.ID = unique_samples, panel = batched_samples[1:length(unique_samples)])
+      # base::unique_samples <- base::unique(filtered_data$sample.ID)
+      # batched_samples <- gl(ceiling(length(base::unique_samples) / 30), 30, labels = 1:ceiling(length(base::unique_samples) / 20))
+      # sample_batches <- data.frame(sample.ID = base::unique_samples, panel = batched_samples[1:length(base::unique_samples)])
       # filtered_data <- left_join(filtered_data, sample_batches, by = "sample.ID") |>
       #   select(sample.ID, seq.ID, abundance, fill_col)
 
@@ -195,7 +195,7 @@ server <- function(input, output, session) {
         dynamic_number <- as.numeric(input$numInput)
 
         # Calculate how many levels to add to make levels of sample.ID a multiple of 20
-        levels_needed <- dynamic_number - (length(unique(filtered_data$sample.ID)) %% dynamic_number)
+        levels_needed <- dynamic_number - (length(base::unique(filtered_data$sample.ID)) %% dynamic_number)
         # Generate random sample.ID names
         new_sample_IDs <- replicate(levels_needed, paste0("blank", sample(1000:9999, 1)))
 
