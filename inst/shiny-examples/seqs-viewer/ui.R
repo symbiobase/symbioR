@@ -6,7 +6,7 @@ library(shinyFiles)
 fluidPage(
   sidebarLayout(
     sidebarPanel(
-      tags$head(tags$style(".main-panel {height: 1200px; overflow-y: auto;}")), # Sets the height
+      tags$head(tags$style(".main-panel {height: 1500px; overflow-y: scroll;}")), # Sets the height
 
       tags$style(HTML("
   .col-sm-4 {
@@ -204,7 +204,7 @@ fluidPage(
       #-------------------- Facet --------------------------@
       div(class="sidebox",
         tags$h3("Facet:"),
-        tags$p("Wrap the number of columns for large datasets with many samples"),
+        tags$p("Wrap the number of rows for large datasets with many samples"),
 
         div(
           style = "display: inline-block; width: 45%;",
@@ -213,7 +213,7 @@ fluidPage(
 
         div(
           style = "display: inline-block; width: 45%;",
-          numericInput("numInput", "Enter a number:", value = 20, min = 1),
+          numericInput("numInput", "Enter a number:", value = 1, min = 1),
         ),
 
       ),

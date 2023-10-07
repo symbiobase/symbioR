@@ -21,6 +21,7 @@ server <- function(input, output, session) {
 
   #-------------------- Get shiny volumes --------------------------@
 
+
   volumes <- shinyFiles::getVolumes()()
 
   #-------------------- Folder input --------------------------@
@@ -146,31 +147,41 @@ server <- function(input, output, session) {
       t()
 
 
-    hclust_bray <- labels(hclust(vegdist(dist_data, "bray")))
-    hclust_euclidean <- labels(hclust(vegdist(dist_data, "euclidean")))
-    hclust_jaccard <- labels(hclust(vegdist(dist_data, "jaccard")))
-    hclust_hellinger <- labels(hclust(vegdist(dist_data, "hellinger")))
+    # Assuming dist_data is already defined
+    hclust_bray <- hclust(vegdist(dist_data, "bray"))
+    updated_order_bray <- hclust_bray$order
+    hclust_bray_order <- hclust_bray$labels[updated_order_bray]
 
+    hclust_euclidean <- hclust(vegdist(dist_data, "euclidean"))
+    updated_order_euclidean <- hclust_euclidean$order
+    hclust_euclidean_order <- hclust_euclidean$labels[updated_order_euclidean]
 
+    hclust_jaccard <- hclust(vegdist(dist_data, "jaccard"))
+    updated_order_jaccard <- hclust_jaccard$order
+    hclust_jaccard_order <- hclust_jaccard$labels[updated_order_jaccard]
+
+    hclust_hellinger <- hclust(vegdist(dist_data, "hellinger"))
+    updated_order_hellinger <- hclust_hellinger$order
+    hclust_hellinger_order <- hclust_hellinger$labels[updated_order_hellinger]
 
     if (input$orderType == "Bray-Curtis") {
       filtered_data <- filtered_data %>%
-        mutate(sample.ID = factor(sample.ID, levels = hclust_bray)) %>%
+        mutate(sample.ID = factor(sample.ID, levels = hclust_bray_order)) %>%
         arrange(sample.ID)
     }
     if (input$orderType == "Euclidean") {
       filtered_data <- filtered_data %>%
-        mutate(sample.ID = factor(sample.ID, levels = hclust_euclidean)) %>%
+        mutate(sample.ID = factor(sample.ID, levels = hclust_euclidean_order)) %>%
         arrange(sample.ID)
     }
     if (input$orderType == "Jaccard") {
       filtered_data <- filtered_data %>%
-        mutate(sample.ID = factor(sample.ID, levels = hclust_jaccard)) %>%
+        mutate(sample.ID = factor(sample.ID, levels = hclust_jaccard_order)) %>%
         arrange(sample.ID)
     }
     if (input$orderType == "Hellingers") {
       filtered_data <- filtered_data %>%
-        mutate(sample.ID = factor(sample.ID, levels = hclust_hellinger)) %>%
+        mutate(sample.ID = factor(sample.ID, levels = hclust_hellinger_order)) %>%
         arrange(sample.ID)
     } else {
     }
@@ -179,12 +190,6 @@ server <- function(input, output, session) {
     #-------------------- facet panel  --------------------------@
 
     if (nrow(filtered_data) > 0) {
-      # # Create batches of 20 for sample.ID and add as a new factor level column
-      # base::unique_samples <- base::unique(filtered_data$sample.ID)
-      # batched_samples <- gl(ceiling(length(base::unique_samples) / 30), 30, labels = 1:ceiling(length(base::unique_samples) / 20))
-      # sample_batches <- data.frame(sample.ID = base::unique_samples, panel = batched_samples[1:length(base::unique_samples)])
-      # filtered_data <- left_join(filtered_data, sample_batches, by = "sample.ID") |>
-      #   select(sample.ID, seq.ID, abundance, fill_col)
 
       p <- ggplot() +
         theme_bw()
@@ -194,34 +199,20 @@ server <- function(input, output, session) {
 
         dynamic_number <- as.numeric(input$numInput)
 
-        # Calculate how many levels to add to make levels of sample.ID a multiple of 20
-        levels_needed <- dynamic_number - (length(base::unique(filtered_data$sample.ID)) %% dynamic_number)
-        # Generate random sample.ID names
-        new_sample_IDs <- replicate(levels_needed, paste0("blank", sample(1000:9999, 1)))
+        create_facet_column <- function(df, n) {
+          df %>%
+            group_by(sample.ID) %>%
+            summarise() %>%
+            mutate(rn = row_number()) %>%
+            mutate(facet_column = letters[ceiling(rn / (nrow(.) / n))]) %>%
+            right_join(df, by = "sample.ID")
+        }
 
-        # Generate additional rows
-        add_rows <- tibble(
-          sample.ID = new_sample_IDs,
-          seq.ID = NA,
-          abundance = rep(0, levels_needed),
-          fill_col = NA
-        )
+        filtered_data <- create_facet_column(filtered_data, dynamic_number)
 
-        # Bind the additional rows to the original dataframe
-        filtered_data <- bind_rows(filtered_data, add_rows)
-
-        # add distinct numbers
-        panel_assignments <- filtered_data %>%
-          distinct(sample.ID) %>%
-          mutate(panel = ceiling(row_number() / dynamic_number))
-
-        filtered_data <- filtered_data %>%
-          left_join(panel_assignments, by = "sample.ID")
-
-        write.csv(filtered_data, "filtered_data.csv")
-
-        p <- p +
-          facet_wrap(~panel, ncol = 1, scales = "free_x")
+        p <- p + facet_wrap(~facet_column, ncol = 1, scales = "free_x", strip.position="right") +
+                 theme(panel.spacing = unit(0.4, "lines"), strip.text = element_text(size = 8)) +
+                 xlab("")
       }
 
       if (abundanceType() == "Relative") {
@@ -248,9 +239,6 @@ server <- function(input, output, session) {
             color = "black", linewidth = 0.1, show.legend = FALSE, stat = "identity"
           )
       }
-
-
-
 
       color_palette <- data_reactive()$colour.seqs
       color_palette["grey"] <- "grey"
@@ -322,9 +310,13 @@ server <- function(input, output, session) {
     )
   })
 
+
+
   output$plotUI <- renderPlotly({
+    facet_height <- as.numeric(input$numInput)
     req(data_reactive()$plot_data) # Make sure there's data before plotting
     p <- reactivePlot()
-    ggplotly(p)
+    p <- ggplotly(p, height=500*facet_height)
+    p %>% layout( margin = list(l = 50, r = 50))
   })
 }
