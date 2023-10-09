@@ -164,7 +164,8 @@ Both of these can filter by sample name, seq abundance, symbiodinium clades and 
 
 ### a) drop low-abundance seqs
 
-remove samples below certain sequence abundance 
+- remove samples below certain sequence abundance < set filter sequence abundance
+
 already built into `extract_seqs_wide()` and `extract_seqs_wide()`, see `?extract_seqs_long` for more info
 
 ```{r eval=TRUE, include=TRUE}
@@ -182,6 +183,7 @@ ___
 ### b) drop unassigned samples
 
 - remove samples with unassigned profiles 
+
 Easier to implement this with tidyverse directly than make a function:
 
 ```{r eval=TRUE, include=TRUE}
@@ -192,8 +194,11 @@ its2_profiles <- extract_its2_profile(folder_path)
 
 # second use filter to remove any sample.ID not in its2_profiles
 
-seqs <- extract_seqs_long(folder_path, type="absolute") |> 
+seqs <- extract_seqs_long(folder_path, type="absolute") %>% 
             filter(sample.ID %in% its2_profiles$sample.ID)
+
+# or implement direct in extract_seqs functions
+seqs <- extract_seqs_long(folder_path, type="absolute", keep_samples=unique(its2_profiles$sample.ID))
 
 ```    
 
@@ -202,7 +207,10 @@ ___
 ### c) drop samples by name
 
 
-remove samples by sample.ID either by full names or by partial matches:
+remove samples selectively based on their names 
+(reasons can be e.g. suspected contamination, wrong sample inclusion, etc) 
+
+either by full names or by partial matches:
 
 ```{r eval=TRUE, include=TRUE}
 
@@ -231,15 +239,127 @@ unique(seqs$sample.ID)
 
 ```
 
+### d) genus specific samples
+
+
+use df 'symportal.qc.postmed.abs.all' to create genus specific sequence abundance tables 
+(parse sequences by name (identified in tables with capital) and remove zero columns (seqs) 
+
+Probably easier to do this in tidyverse:
+
+```{r}
+
+### for host:
+# first get turbinaria sample.ID (use pull to get the column and convert to vector)
+turbs_samples <- extract_metadata(folder_path) %>% 
+  filter(host_genus=="Turbinaria") |> 
+  pull(sample.ID)
+
+# use the list of sample.ID from the metadata and pass to extract_seqs 
+tmp <- extract_seqs_long(folder_path, type="absolute", keep_samples=turbs_samples)
+
+
+### for symbiodinium it's even easier:
+
+tmp <- extract_seqs_long(folder_path, type="absolute", clade="C")
+tmp <- extract_seqs_long(folder_path, type="absolute", clade=c("C", "D"))
+
+
+```
+
+### d) others
+
+- use all post-qc absolute sequence tables to output relative abundances
+
+Same again - extract_metadata functions convert relative abundance from absolute abundance so use them directly:
+
+```{r}
+
+tmp <- extract_seqs_long(folder_path, type="relative")
+
+```
+
+- list of QC excluded sequence names df/list ‘excluded.qc.sequences’
+- absolute seq count table df 'symportal.qc.postmed.abs.all'
+- absolute seq count tables by genus df 'symportal.qc.postmed.abs.A – B – C etc', 
+- absolute seq count table df 'symportal.qc.postmed.rel.all'
+- absolute seq count tables by genus df 'symportal.qc.postmed.rel.A – B – C etc', 
+
+
+```{r}
+
+# Need to think about excluded sequences but this approach works:
+
+clade_c <- extract_seqs_long(folder_path, type="absolute", clade="C") |> pull(sample.ID) |> unique()
+all_clades <- extract_seqs_long(folder_path, type="absolute") |> pull(sample.ID) |> unique()
+
+setdiff(all_clades, clade_c)
+
+# 
+tmp <- extract_seqs_wide(folder_path, type="absolute", remove_zero=TRUE) # remove_zero is TRUE by default
+tmp <- extract_seqs_wide(folder_path, type="absolute", clade = c("A","B","C")) # or just one clade="C"
+tmp <- extract_seqs_wide(folder_path, type="relative", remove_zero=TRUE) # remove_zero is TRUE by default
+tmp <- extract_seqs_wide(folder_path, type="relative", clade = c("A","B","C")) # or just one clade="C"
+
+```
+
+
 ___
 
 ## 4) create fasta files
 
+### i) get fasta and extracts seqs 
+Input: df/list 'symportal.import.fasta' and post-qc absolute count tables (all, genus specific)
+(format requirements for names list to exlude: txt format, names on separate lines) 
+- create names list for all sequences in the post QC abundance tables
+- create names list for all profile defining sequences/variants (DIVs) 
+
+```{r}
+
+# get seq count tables for let's say clade D
+long_seqs <- extract_seqs_long(folder_path, clade="D")
+wide_seqs <- extract_seqs_wide(folder_path, clade="D")
+
+```
+
+(to create fasta files below can use custom python script ‘aggregate_fasta_by_nameslist.py’, requires an input fasta and a names list as per formatting specs above)
+- create truncated fasta files from created names lists ‘fasta.seqlist.all’, ‘fasta.seqlist.A’, etc.
+- create truncate fasta file from input df/list 'symportal.import.fasta'  and ‘fasta.seqlist.DIV’
+
+```{r}
+# get fastas and only keep the seq.ID that are in the count tables above
+fastas <- extract_fasta(folder_path, type="postmed", keep_samples=unique(long_seqs$seq.ID))
+
+```
+
+- option to specify a custom sequence names list for truncating fasta (by just writing out the names?)
+(for creating a final phylogeny, because some DIVs will/should not be phylogenetically relevant)
+     (function 'create_fasta_targeted' > df/list ‘fasta.postmed.targeted’) 
+
+```{r}
+# make fasta based on a keep_list of seq.ID
+fastas <- extract_fasta(folder_path, type="postmed", keep_samples=c("D1", "D6", "D4"))
+
+```
+
+Save outputs:
+
+```{r eval=FALSE, include=TRUE}
+
+library(ape)
+
+write.FASTA(fasta, "onlyD.fasta")
+write.csv(long_seqs, "long_seqsD.csv")
+write.csv(wide_seqs, "long_seqsD.csv")
+
+```
 
 ___
 
 ## 5) run phylogeny
 
+
+<<< stop here >>>
 
 ___
 

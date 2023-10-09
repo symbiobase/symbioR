@@ -1,6 +1,17 @@
 ---
 title: "extract_seqs"
 date: "`r Sys.Date()`"
+
+output:
+  html_document:
+    css: tidyseqs.css
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    code_folding: show
+    fig_caption: true
+    
 ---
 
 

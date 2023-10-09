@@ -5,15 +5,17 @@
 #' @param clade filter by single "C" or multiple clades c("C", "D") to filter sequences by
 #' @param drop_samples drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")
 #' @param drop_seqs drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")
+#' @param keep_samples drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")
 #' @param threshold Set threshold to remove samples if less than the threshold (defaults to 1000)
 #' @param silent defaults to TRUE, if FALSE then prints a list of removed sample names
 #' @param ... onwards
 #' @export
 #' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 
-extract_seqs_wide <- function(folder, type = "relative", clade = LETTERS[1:10], threshold = 0, drop_samples = NULL, drop_seqs = NULL, silent = TRUE, ...) {
+extract_seqs_wide <- function(folder, type = "relative", clade = LETTERS[1:10], threshold = 0, remove_zero=TRUE, drop_samples = NULL, keep_samples = NULL, drop_seqs = NULL, silent = TRUE, ...) {
   # get matches with dropped samples:
   drop_samples_str <- ifelse(length(drop_samples) == 0, "NA_character_", paste(drop_samples, collapse = "|"))
+  keep_samples_str <- ifelse(length(keep_samples) == 0, "NA_character_", paste(keep_samples, collapse = "|"))
   drop_seqs_str <- ifelse(length(drop_seqs) == 0, "NA_character_", paste(drop_seqs, collapse = "|"))
 
   # read files
@@ -29,6 +31,10 @@ extract_seqs_wide <- function(folder, type = "relative", clade = LETTERS[1:10], 
     dplyr::filter(dplyr::case_when(
       drop_samples_str == "NA_character_" ~ TRUE, # drop rows by sample name
       TRUE ~ !stringi::stri_detect_regex(sample_name, drop_samples_str, opts_regex = stringi::stri_opts_regex(case_insensitive = FALSE))
+    )) %>%
+    dplyr::filter(dplyr::case_when(
+      keep_samples_str == "NA_character_" ~ TRUE, # keep rows by sample name
+      TRUE ~ stringi::stri_detect_regex(sample_name, keep_samples_str, opts_regex = stringi::stri_opts_regex(case_insensitive = FALSE))
     )) %>%
     dplyr::select(-matches(drop_seqs_str, ignore.case = FALSE)) %>% # drop columns by seq name
     # dplyr::filter(dplyr::case_when(drop_samples_str == "NA_character_" ~ TRUE, TRUE ~ !str_detect(sample_name, drop_samples_str))) %>% # drop rows by sample name
@@ -53,6 +59,12 @@ extract_seqs_wide <- function(folder, type = "relative", clade = LETTERS[1:10], 
     dplyr::mutate(dplyr::across(dplyr::where(is.numeric), ~ . / row_sum)) %>%
     dplyr::select(-row_sum)
 
+  if (remove_zero == TRUE) {
+    absolute <- absolute %>% select_if(~sum(. != 0) > 0)
+    relative <- relative %>% select_if(~sum(. != 0) > 0)
+  }
+
+
   ########################
   ## add checks:
   if (mean(rowSums(relative) / 1) != 1) {
@@ -67,6 +79,7 @@ extract_seqs_wide <- function(folder, type = "relative", clade = LETTERS[1:10], 
     stop("STOP: code error, column sums contain 0 or NA.")
   }
   ########################
+
 
   # return functions:
   if (type == "absolute") {
