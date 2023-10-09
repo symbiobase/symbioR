@@ -11,7 +11,7 @@
 #' @export
 #' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 
-extract_seqs_wide <- function(folder, type = "relative", clade = LETTERS[1:10], threshold = 1000, drop_samples = NULL, drop_seqs = NULL, silent = TRUE, ...) {
+extract_seqs_wide <- function(folder, type = "relative", clade = LETTERS[1:10], threshold = 0, drop_samples = NULL, drop_seqs = NULL, silent = TRUE, ...) {
   # get matches with dropped samples:
   drop_samples_str <- ifelse(length(drop_samples) == 0, "NA_character_", paste(drop_samples, collapse = "|"))
   drop_seqs_str <- ifelse(length(drop_seqs) == 0, "NA_character_", paste(drop_seqs, collapse = "|"))

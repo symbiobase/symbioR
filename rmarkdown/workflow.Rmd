@@ -1,0 +1,250 @@
+---
+title: "Tidyseqs workflow"
+date: "`r Sys.Date()`"
+---
+
+```{css, echo=FALSE}
+h1.title {
+  font-size: 32px;
+}
+
+h1 {
+  font-size: 24px;
+}
+
+h2 {
+  font-size: 22px;
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: normal;
+}
+
+h4 {
+  font-size: 16px;
+  font-style: italic;
+  font-weight: normal;
+}
+
+
+figcaption {
+  padding: .5em;
+  background: lightgrey;
+  font-size: 10px;
+  font-variant: italic;
+}
+```
+
+
+```{r}
+devtools::load_all()
+#remotes::install_github('rstudio/DT')
+library(DT)
+library(tidyverse)
+#library(coralseed)
+```
+
+## 1) Importing symportal files
+
+### a) Set folder path:
+
+```{r}
+folder_path <- ("/Volumes/Macintosh HD/Users/rof011/symbiodinium/20230120T102936_esampayo") 
+```
+
+___
+
+### a)  import metadata file
+
+Extract metadata. Add options here? 
+
+```{r}
+metadata_all <- extract_metadata(folder_path)
+metadata <- extract_metadata(folder_path) %>% dplyr::select("sample.ID", "sample_uid", "host_genus", "host_species")
+datatable_seqs(metadata)
+```
+
+___
+
+### b)  import symportal postmed seqs
+Only imported the raw sequences, match these with metadata using left_join and sample.ID as needed
+either `type="absolute"` or `type="relative"` (default is `"absolute"`)
+
+```{r}
+its2_profiles <- extract_its2_profile(folder_path, type="absolute")
+its2_profiles <- extract_its2_profile(folder_path, type="relative")
+
+its2_profiles <- extract_its2_profile(folder_path) %>% left_join(metadata,., by="sample.ID")
+
+datatable_seqs(its2_profiles)
+```
+
+___
+
+
+### c)  import symportal profiles 
+Only imported the profiles, match these with metadata using left_join and sample.ID as needed
+
+```{r}
+its2_profile_uid <- extract_its2_profile_UID(folder_path)
+its2_profile_uid <- extract_its2_profile_UID(folder_path) %>% left_join(metadata,., by="sample.ID")
+
+
+
+datatable_seqs(its2_profile_uid)
+
+```
+
+___
+
+
+### d)  import sequences
+import in wide or long format
+
+```{r}
+seqs <- extract_seqs_wide(folder_path)
+seqs <- extract_seqs_long(folder_path)
+
+seqs <- extract_seqs_long(folder_path) %>% left_join(metadata,., by="sample.ID")
+
+datatable_seqs(seqs)
+
+```
+
+___
+
+
+### e)  import fasta files
+either premed or postmed
+
+```{r}
+fastas <- extract_fasta(folder_path, type="premed")
+fastas <- extract_fasta(folder_path, type="postmed")
+
+head(fastas)
+
+```
+
+Note: do we need separate imports for clade types? 
+if you do we can amend around `ape::read.dna` or filter after using `extract_fasta` 
+
+```{r}
+fastas <- extract_fasta(folder_path, type="postmed") # 533 seqs
+
+sym_fasta_c <- ape::read.dna(paste0(folder_path,"/between_sample_distances/C/clade_C_seqs.aligned.fasta"), format = "fasta") # 448 seqs
+sym_fasta_d <- ape::read.dna(paste0(folder_path,"/between_sample_distances/D/clade_D_seqs.aligned.fasta"), format = "fasta") # 69 seqs
+
+# 517 seqs between c and d? 
+```
+
+___
+
+### 2) Interactive Sequence Viewer
+
+```{r eval=FALSE, include=TRUE}
+
+seqs_viewer()
+
+### note: change this later so you can specify a path instead of searching for file
+# e.g. seqs_viewer(folder_path)
+
+
+```
+
+___
+
+## 3) Quality control 
+
+
+Note - I think the steps below cover both #3 and #4 in the word document and simplify things substantially
+Currently there's just two functions that do all the heavy lifting:
+`extract_seqs_wide()` and `extract_seqs_long()`. 
+Both of these can filter by sample name, seq abundance, symbiodinium clades and do all the QC.
+
+### a) drop low-abundance seqs
+
+remove samples below certain sequence abundance 
+already built into `extract_seqs_wide()` and `extract_seqs_wide()`, see `?extract_seqs_long` for more info
+
+```{r eval=TRUE, include=TRUE}
+
+# remove all seq.ID less than 7500 reads:
+
+seqs <- extract_seqs_long(folder_path, threshold="7500")
+seqs <- extract_seqs_wide(folder_path, threshold="7500")
+
+datatable_seqs(seqs)
+
+```
+___
+
+### b) drop unassigned samples
+
+- remove samples with unassigned profiles 
+Easier to implement this with tidyverse directly than make a function:
+
+```{r eval=TRUE, include=TRUE}
+
+# first extract the ITS profiles
+
+its2_profiles <- extract_its2_profile(folder_path)
+
+# second use filter to remove any sample.ID not in its2_profiles
+
+seqs <- extract_seqs_long(folder_path, type="absolute") |> 
+            filter(sample.ID %in% its2_profiles$sample.ID)
+
+```    
+
+___
+
+### c) drop samples by name
+
+
+remove samples by sample.ID either by full names or by partial matches:
+
+```{r eval=TRUE, include=TRUE}
+
+### First option: drop samples after importing using basic tidyverse:
+
+seqs <- extract_seqs_long(folder_path, type="absolute") 
+
+seqs %>% filter(!sample.ID %in% c("AU18_0359", "AU18_0457")) # remove two samples
+seqs %>% filter(!sample.ID %in% !grepl("AU18_03|AU18_04", sample.ID)) # remove any AU18_03** or AU18_04**
+
+### Second option: drop samples while extracting directly using `drop_samples` argument:
+
+seqs <- extract_seqs_long(folder_path)
+unique(seqs$sample.ID)
+
+# drop samples by exact vector 
+seqs <- extract_seqs_long(folder_path, drop_samples=c("AU18_0457", "AU18_0359", "AU18_1040", "AU18_0482", "AU18_0388", "AU18_0696", "AU18_0100"))
+
+# drop samples by partial matches (e.g. just the numbers)
+seqs <- extract_seqs_long(folder_path, drop_samples=c("0457", "0359", "1040", "0482", "0388", "0696", "0100"))
+
+# drop any samples by partial matches between "AU18_0000" to "AU18_0999" 
+seqs <- extract_seqs_long(folder_path, drop_samples=sprintf("AU18_%04d", seq(0, 999)))
+unique(seqs$sample.ID)
+
+
+```
+
+___
+
+## 4) create fasta files
+
+
+___
+
+## 5) run phylogeny
+
+
+___
+
+## 6) cluster analysis
+
+___
+
+## 7) metadata and output

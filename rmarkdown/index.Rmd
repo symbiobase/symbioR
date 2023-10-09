@@ -1,0 +1,14 @@
+---
+title: "tidyseqs"
+date: "`r Sys.Date()`"
+---
+
+
+## Installation
+
+`tidyseqs` can be installed on github via `remotes`:
+
+```{r class.source = 'fold-show', eval=FALSE, include=TRUE}
+#install.packages("remotes")
+remotes::install_github("marine-ecologist/tidyseqs")
+```

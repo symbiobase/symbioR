@@ -7,9 +7,9 @@
 #' @return ggplot and dendrogram for seqs/samples
 
 
-plot_seqs_dendro <- function(folder, type="relative", dist="bray"){
+plot_seqs_dendro <- function(folder, dist="bray",...){
 
-  df <- symportalfunctions::extract_seqs_long(folder)
+  df <- symportalfunctions::extract_seqs_long(folder, ...)
   cols <- symportalfunctions::extract_plot_colors(folder_path) |>
     as.data.frame() |>
     dplyr::rename("col"=1) |>
@@ -32,10 +32,11 @@ plot_seqs_dendro <- function(folder, type="relative", dist="bray"){
     ggplot2::xlab("") +
     ggplot2::geom_bar(data = df2,
                      ggplot2::aes(x = sample.ID, y = abundance, fill = col,  group = abundance),
-      color = "black", linewidth = 0.1, position = ggplot2::position_fill(reverse = TRUE),
-      show.legend = FALSE, stat = "identity") + ggplot2::scale_y_reverse() +
+      color = "black", linewidth = 0.1,
+      show.legend = FALSE, position="stack", stat="identity") +
     ggh4x::scale_x_dendrogram(hclust=hclust_dist, position="bottom") +
-    ggplot2::scale_fill_identity() + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1))
+    ggplot2::scale_fill_identity() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1))
 
   return(plot)
 

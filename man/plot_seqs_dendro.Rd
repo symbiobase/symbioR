@@ -4,14 +4,14 @@
 \alias{plot_seqs_dendro}
 \title{Function to plot seq.IDs per sample and hierarchical clustering of sample order with dendrogram}
 \usage{
-plot_seqs_dendro(folder, type = "relative", dist = "bray")
+plot_seqs_dendro(folder, dist = "bray", ...)
 }
 \arguments{
 \item{folder}{location of the root Symportal output}
 
-\item{type}{one of "relative" or "absolute"}
-
 \item{dist}{a distance matrix method from vegan, see ?vegdist for details}
+
+\item{type}{one of "relative" or "absolute"}
 }
 \value{
 ggplot and dendrogram for seqs/samples

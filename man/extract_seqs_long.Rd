@@ -8,7 +8,7 @@ extract_seqs_long(
   folder,
   type = "relative",
   clade = LETTERS[1:10],
-  threshold = 1000,
+  threshold = 0,
   drop_samples = NULL,
   drop_seqs = NULL,
   silent = TRUE

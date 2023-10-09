@@ -1,0 +1,26 @@
+---
+name: "tidyseqs"
+output_dir: "../docs/"
+navbar:
+  title: "tidyseqs"
+  type: default
+  left:
+  - text: "Workflow"
+    href: workflow.html
+  - text: "Visualise seqs"
+    href: plotseqs.html
+  - text: "Notes"
+    menu:
+    - text: "extract_seqs"
+      href: extract_seqs.html
+
+output:
+  html_document:
+    css: tidyseqs.css
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    code_folding: hide
+    fig_caption: true
+---

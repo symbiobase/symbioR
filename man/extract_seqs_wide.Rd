@@ -8,10 +8,11 @@ extract_seqs_wide(
   folder,
   type = "relative",
   clade = LETTERS[1:10],
-  threshold = 1000,
+  threshold = 0,
   drop_samples = NULL,
   drop_seqs = NULL,
-  silent = TRUE
+  silent = TRUE,
+  ...
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ extract_seqs_wide(
 \item{drop_seqs}{drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")}
 
 \item{silent}{defaults to TRUE, if FALSE then prints a list of removed sample names}
+
+\item{...}{onwards}
 }
 \value{
 A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
