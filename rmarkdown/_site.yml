@@ -4,6 +4,7 @@ output_dir: "../docs/"
 navbar:
   title: "tidyseqs"
   type: default
+  href: "index.html"
   left:
   - text: "Workflow"
     href: workflow.html

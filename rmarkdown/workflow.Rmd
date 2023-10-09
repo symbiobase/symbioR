@@ -140,9 +140,9 @@ sym_fasta_d <- ape::read.dna(paste0(folder_path,"/between_sample_distances/D/cla
 
 ___
 
-### 2) Interactive Sequence Viewer
+## 2) Interactive Sequence Viewer
 
-```{r eval=FALSE, include=TRUE}
+```{r eval=FALSE, include=TRUE, code.folding="show"}
 
 seqs_viewer()
 

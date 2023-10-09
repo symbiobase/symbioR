@@ -4,7 +4,7 @@ date: "`r Sys.Date()`"
 ---
 
 
-## Installation
+### Installation
 
 `tidyseqs` can be installed on github via `remotes`:
 

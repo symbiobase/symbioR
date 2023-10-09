@@ -45,7 +45,7 @@ There are three approaches to plotting sequences:
 
 `plot_seqs()` takes the symportal function for either `type = "relative"` or `type = "abundance"`, and will accept any distance matrix from `vegan` (see `?vegdist` for details). For example:
 
-```{r, fig.width=20, fig.height=6}
+```{r, fig.width=20, fig.height=8}
 
 library(symportalfunctions)
 
@@ -61,7 +61,7 @@ For example:
 
 filter all seqs < 6000 reads
 
-```{r, fig.width=20, fig.height=6}
+```{r, fig.width=20, fig.height=8}
 
 folder_path <- ("/Volumes/Macintosh HD/Users/rof011/symbiodinium/20230120T102936_esampayo") 
 
@@ -72,7 +72,7 @@ plot_seqs(folder_path, type = "relative",  threshold=6000)
 
 or only clade D:
 
-```{r, fig.width=20, fig.height=6}
+```{r, fig.width=20, fig.height=8}
 
 folder_path <- ("/Volumes/Macintosh HD/Users/rof011/symbiodinium/20230120T102936_esampayo") 
 
@@ -82,7 +82,7 @@ plot_seqs_dendro(folder_path, clade = "D", type = "relative", dist="bray")
 
 or only filter to exclude samples between "AU18_0000" to "AU18_0999" 
 
-```{r, fig.width=20, fig.height=6}
+```{r, fig.width=20, fig.height=8}
 
 folder_path <- ("/Volumes/Macintosh HD/Users/rof011/symbiodinium/20230120T102936_esampayo") 
 
@@ -98,7 +98,7 @@ the argument "dist" accepts any distance matrix from `vegan` (see `method` in `?
 
 For example:
 
-```{r, fig.width=20, fig.height=6}
+```{r, fig.width=20, fig.height=8}
 
 folder_path <- ("/Volumes/Macintosh HD/Users/rof011/symbiodinium/20230120T102936_esampayo") 
 
@@ -106,7 +106,7 @@ tmp <- plot_seqs_dendro(folder_path, type = "relative", dist="bray")
 
 ```
 
-```{r, fig.width=20, fig.height=6}
+```{r, fig.width=20, fig.height=8}
 
 folder_path <- ("/Volumes/Macintosh HD/Users/rof011/symbiodinium/20230120T102936_esampayo") 
 
