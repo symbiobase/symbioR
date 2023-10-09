@@ -140,49 +140,59 @@ server <- function(input, output, session) {
 
     #-------------------- reorder sample.ID with cluster analysis  --------------------------@
 
+    ### Convert seq.ID abundance to relative abundance for vegdist
+
     dist_data <- data_reactive()$plot_data |>
       select(sample.ID, seq.ID, abundance) |>
       pivot_wider(names_from = sample.ID, values_from = abundance, values_fill = 0) |>
       column_to_rownames("seq.ID") |>
       t()
 
-
-    # Assuming dist_data is already defined
-    hclust_bray <- hclust(vegdist(dist_data, "bray"))
-    updated_order_bray <- hclust_bray$order
-    hclust_bray_order <- hclust_bray$labels[updated_order_bray]
-
-    hclust_euclidean <- hclust(vegdist(dist_data, "euclidean"))
-    updated_order_euclidean <- hclust_euclidean$order
-    hclust_euclidean_order <- hclust_euclidean$labels[updated_order_euclidean]
-
-    hclust_jaccard <- hclust(vegdist(dist_data, "jaccard"))
-    updated_order_jaccard <- hclust_jaccard$order
-    hclust_jaccard_order <- hclust_jaccard$labels[updated_order_jaccard]
-
-    hclust_hellinger <- hclust(vegdist(dist_data, "hellinger"))
-    updated_order_hellinger <- hclust_hellinger$order
-    hclust_hellinger_order <- hclust_hellinger$labels[updated_order_hellinger]
+    ### update order by dissimilarity index
 
     if (input$orderType == "Bray-Curtis") {
+
+      hclust_bray <- hclust(vegdist(decostand(dist_data,"total"), "bray"))
+      updated_order_bray <- hclust_bray$order
+      hclust_bray_order <- hclust_bray$labels[updated_order_bray]
+
       filtered_data <- filtered_data %>%
         mutate(sample.ID = factor(sample.ID, levels = hclust_bray_order)) %>%
         arrange(sample.ID)
+
+      write.csv(filtered_data, "temp.csv")
+
     }
     if (input$orderType == "Euclidean") {
+
+      hclust_euclidean <- hclust(vegdist(decostand(dist_data,"total"), "euclidean"))
+      updated_order_euclidean <- hclust_euclidean$order
+      hclust_euclidean_order <- hclust_euclidean$labels[updated_order_euclidean]
+
       filtered_data <- filtered_data %>%
         mutate(sample.ID = factor(sample.ID, levels = hclust_euclidean_order)) %>%
         arrange(sample.ID)
     }
     if (input$orderType == "Jaccard") {
+
+      hclust_jaccard <- hclust(vegdist(decostand(dist_data,"total"), "jaccard"))
+      updated_order_jaccard <- hclust_jaccard$order
+      hclust_jaccard_order <- hclust_jaccard$labels[updated_order_jaccard]
+
       filtered_data <- filtered_data %>%
         mutate(sample.ID = factor(sample.ID, levels = hclust_jaccard_order)) %>%
         arrange(sample.ID)
     }
     if (input$orderType == "Hellingers") {
+
+      hclust_hellinger <- hclust(vegdist(decostand(dist_data,"total"), "hellinger"))
+      updated_order_hellinger <- hclust_hellinger$order
+      hclust_hellinger_order <- hclust_hellinger$labels[updated_order_hellinger]
+
       filtered_data <- filtered_data %>%
         mutate(sample.ID = factor(sample.ID, levels = hclust_hellinger_order)) %>%
         arrange(sample.ID)
+
     } else {
     }
 

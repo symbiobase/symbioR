@@ -17,11 +17,11 @@
 
  create_facet_column <- function(df, n) {
    df %>%
-     group_by(sample.ID) %>%
-     summarise() %>%
-     mutate(rn = row_number()) %>%
-     mutate(facet_column = letters[ceiling(rn / (nrow(.) / n))]) %>%
-     right_join(df, by = "sample.ID")
+     dplyr::group_by(sample.ID) %>%
+     dplyr::summarise() %>%
+     dplyr::mutate(rn = dplyr::row_number()) %>%
+     dplyr::mutate(facet_column = letters[ceiling(rn / (nrow(.) / n))]) %>%
+     dplyr::right_join(df, by = "sample.ID")
  }
 
  tmp2 <- create_facet_column(tmp, 3)
