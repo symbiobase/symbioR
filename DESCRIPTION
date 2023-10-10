@@ -1,6 +1,6 @@
 Package: symportalfunctions
 Title: Collection of Functions to Extract Data from Symportal
-Version: 0.3.4
+Version: 0.3.5
 Authors@R: 
     person("George", "Roff", , "George.Roff@csiro.au", role = c("aut", "cre"))
 Description: Collection of functions to extract data from Symportal.
