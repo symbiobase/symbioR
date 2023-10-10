@@ -203,22 +203,36 @@ fluidPage(
       ),
       #-------------------- Facet --------------------------@
       div(class="sidebox",
-        tags$h3("Facet:"),
-        tags$p("Wrap the number of rows for large datasets with many samples"),
+          tags$h3("Facet"),
+          tags$p("Wrap the number of rows for large datasets"),
 
-        div(
-          style = "display: inline-block; width: 45%;",
-          actionButton("toggleFacetBtn", "Facets"),
-        ),
+          div(
+            style = "display: inline-block; width: 25%;",
+            numericInput("numInput", "Enter a number:", value = 1, min = 1),
+          ),
 
-        div(
-          style = "display: inline-block; width: 45%;",
-          numericInput("numInput", "Enter a number:", value = 1, min = 1),
-        ),
+          div(
+            style = "display: inline-block; width: 40%;",
+            tags$p(" rows"),
+          ),
+
+          tags$br(),
+
+          div(
+            style = "display: inline-block; width: 40%;",
+            numericInput("numInputHeight", "Enter a number:", value = 500, min = 100, max=1200, step=50),
+          ),
+
+          div(
+            style = "display: inline-block; width: 40%;",
+            tags$p(" row height"),
+          ),
 
       ),
       div(class="sidebox-break",
       ),
+
+
       #-------------------- type --------------------------@
       div(class="sidebox",
         tags$h3("Cluster samples:"),

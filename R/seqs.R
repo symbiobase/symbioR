@@ -2,14 +2,12 @@
 #'
 #' @export
 
-seqs_viewer <- function() {
-  appDir <- system.file("shiny-examples", "seqs-viewer", package = "symportalfunctions")
-  if (appDir == "") {
-    stop("Could not find example directory. Try re-installing `mypackage`.", call. = FALSE)
+seqs_viewer <- function(default_folder = NULL) {
+  options(default_folder = default_folder)
+  appDir <- system.file("shiny", "seqs-viewer", package = "symportalfunctions")
+  shiny::runApp(appDir, display.mode = "normal", launch.browser = TRUE)
+
+  # shiny::runApp(appDir, display.mode = "normal",
+  #               launch.browser = getOption("shiny.launch.browser", interactive()))
+
   }
-
-  shiny::runApp(appDir, display.mode = "normal",
-                launch.browser = getOption("shiny.launch.browser", interactive()),)
-
-
-}

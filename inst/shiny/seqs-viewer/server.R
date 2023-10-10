@@ -9,6 +9,8 @@ library(vegan)
 
 
 server <- function(input, output, session) {
+
+
   #-------------------- Initialize reactive values --------------------------@
 
   data_vals <- reactiveVal(list(plot_data = NULL, colour.seqs = NULL, its2.type.names = NULL))
@@ -26,9 +28,26 @@ server <- function(input, output, session) {
 
   #-------------------- Folder input --------------------------@
 
+  default_folder <- getOption("default_folder")
+
+  if (!is.null(default_folder)) {
+    # If default_folder is provided, use that as the folder location
+    folder_path <- default_folder
+    # Your code to process the default_folder, similar to what you do in observeEvent
+    plot_data_new <- extract_seqs_long(folder_path, type = "absolute")
+    plot_data_new2 <- extract_seqs_wide(folder_path, type = "absolute")
+    colour.seqs_new <- extract_plot_colors(folder_path)
+    its2.type.names_new <- extract_its2_names(folder_path)
+      metadata_new <- extract_metadata(folder_path) %>% dplyr::select("sample.ID", "sample_uid", "host_genus", "host_species", "collection_longitude", "collection_latitude")
+
+    data_vals(list(plot_data = plot_data_new, plot_data_2 = plot_data_new2, colour.seqs = colour.seqs_new, its2.type.names = its2.type.names_new))
+  }
+
+
   observeEvent(input$folderInput, {
     shinyDirChoose(input, "folderInput", roots = volumes, filetypes = c("", "txt"))
     folder <- shinyFiles::parseDirPath(volumes, input$folderInput)
+
     # Check if folder has been properly selected
     if (length(folder) > 0) {
       folder_path <- as.character(folder)
@@ -38,6 +57,9 @@ server <- function(input, output, session) {
       plot_data_new2 <- extract_seqs_wide(folder_path, type = "absolute")
       colour.seqs_new <- extract_plot_colors(folder_path)
       its2.type.names_new <- extract_its2_names(folder_path)
+      metadata_new <- extract_metadata(folder_path)
+
+
       data_vals(list(plot_data = plot_data_new, plot_data_2 = plot_data_new2, colour.seqs = colour.seqs_new, its2.type.names = its2.type.names_new))
     } else {
       # Display a notification if there's an issue with folder selection
@@ -52,11 +74,7 @@ server <- function(input, output, session) {
     req(data_reactive()$plot_data)
     p <- reactivePlot()
 
-    # Adjusting height based on number of batches
-    number_of_batches <- length(base::unique(data_reactive()$plot_data$batch))
-    plot_height <- number_of_batches * 600 # You can adjust the multiplier based on your needs
-
-    ggplotly(p, height = plot_height)
+    ggplotly(p)
   })
 
   #-------------------- seq and sample.id --------------------------@
@@ -79,16 +97,20 @@ server <- function(input, output, session) {
     print(input$seqID)
   })
 
+
   data_reactive <- reactive({
     req(data_vals()$plot_data)
     data_vals()
   })
+
+
 
   #-------------------- reactivePlot --------------------------@
 
   reactivePlot <- reactive({
     req(data_reactive()$plot_data)
     filtered_data <- data_reactive()$plot_data
+
 
     #-------------------- filter by seq.ID --------------------------@
     if ("ALL" %in% input$seqID) {
@@ -138,9 +160,22 @@ server <- function(input, output, session) {
       mutate(fill_col = ifelse(greyFilterActivated() & cumulative_percentage <= (input$minGrey / 100), "grey", as.character(seq.ID)))
 
 
+    #-------------------- join metadata  --------------------------@
+
+    filtered_data <- left_join(filtered_data, metadata_new, by="sample.ID")
+
+    #-------------------- calculate relative abundance for text labels  --------------------------@
+
+    filtered_data <- filtered_data %>%
+      group_by(sample.ID) %>%
+      mutate(total = sum(abundance),
+             proportion = abundance / total) %>%
+      ungroup()
+
+
     #-------------------- reorder sample.ID with cluster analysis  --------------------------@
 
-    ### Convert seq.ID abundance to relative abundance for vegdist
+    ### Convert seq.ID abundance to relative abundance for vegdist - note this is on abs not relative
 
     dist_data <- data_reactive()$plot_data |>
       select(sample.ID, seq.ID, abundance) |>
@@ -160,7 +195,6 @@ server <- function(input, output, session) {
         mutate(sample.ID = factor(sample.ID, levels = hclust_bray_order)) %>%
         arrange(sample.ID)
 
-      write.csv(filtered_data, "temp.csv")
 
     }
     if (input$orderType == "Euclidean") {
@@ -196,70 +230,65 @@ server <- function(input, output, session) {
     } else {
     }
 
+    color_palette <- data_reactive()$colour.seqs
 
     #-------------------- facet panel  --------------------------@
 
-    if (nrow(filtered_data) > 0) {
 
-      p <- ggplot() +
-        theme_bw()
+      dynamic_number <- as.numeric(input$numInput)
 
 
-      if (facetActivated()) {
-
-        dynamic_number <- as.numeric(input$numInput)
-
-        create_facet_column <- function(df, n) {
-          df %>%
-            group_by(sample.ID) %>%
-            summarise() %>%
-            mutate(rn = row_number()) %>%
-            mutate(facet_column = letters[ceiling(rn / (nrow(.) / n))]) %>%
-            right_join(df, by = "sample.ID")
-        }
-
-        filtered_data <- create_facet_column(filtered_data, dynamic_number)
-
-        p <- p + facet_wrap(~facet_column, ncol = 1, scales = "free_x", strip.position="right") +
-                 theme(panel.spacing = unit(0.4, "lines"), strip.text = element_text(size = 8)) +
-                 xlab("")
+      create_facet_column <- function(df, n) {
+        df %>%
+          group_by(sample.ID) %>%
+          summarise() %>%
+          mutate(rn = row_number()) %>%
+          #select(-facet_column) %>%
+          mutate(facet_column = letters[ceiling(rn / (nrow(.) / n))]) %>%
+          right_join(df, by = "sample.ID")
       }
 
+      filtered_data <- create_facet_column(filtered_data, dynamic_number)
+
+
+    #-------------------- initialise plot  --------------------------@
+
+
+    if (nrow(filtered_data) > 0) {
+
+      p <- ggplot(data = filtered_data,
+                  aes(x = sample.ID, y = abundance,
+                      text = (paste(
+                        "Species: ", host_species,
+#                        "<br>lon/lat: ", paste0("[",round(collection_longitude,1),"] [", round(collection_latitude,1),"]"),
+                        "<br>Latitude: ", round(collection_latitude,2),
+                        "<br>Seq.ID:", seq.ID,
+                        "<br>Abundance: ", abundance,
+                        "<br>Proportion: ", round(proportion,2))),
+                      fill = fill_col, group = abundance)) +
+        theme_bw()
+
       if (abundanceType() == "Relative") {
-        p <- p + # facet_wrap(~panel, ncol=1, scales="free_x") +
-          geom_bar(
-            data = filtered_data,
-            aes(
-              x = sample.ID, y = abundance,
-              fill = fill_col,
-              group = abundance
-            ),
-            color = "black", linewidth = 0.1, position = position_fill(reverse = TRUE),
-            show.legend = FALSE, stat = "identity"
-          ) + scale_y_reverse()
+        p <- p + geom_bar(color = "black", linewidth = 0.1, show.legend = FALSE, stat = "identity",  position = position_fill(reverse = TRUE)) +
+                  facet_wrap(~facet_column, ncol = 1, scales = "free_x", strip.position="right") +
+                  scale_y_reverse(breaks=seq(0,1,0.2), expand = c(0, 0)) + xlab("") + ylab("") +
+                  theme(panel.spacing = unit(0.4, "lines"), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                        strip.text = element_text(colour = 'white'), strip.background = element_rect(fill="white", color="white"))
       } else {
-        p <- p + # facet_wrap(~panel, ncol=1, scales="free_x") +
-          geom_bar(
-            data = filtered_data,
-            aes(
-              x = sample.ID, y = abundance,
-              fill = fill_col,
-              group = abundance
-            ),
-            color = "black", linewidth = 0.1, show.legend = FALSE, stat = "identity"
-          )
+        p <- p +
+              geom_bar(color = "black", linewidth = 0.1, show.legend = FALSE, stat = "identity") +
+                  facet_wrap(~facet_column, ncol = 1, scales = "free_x", strip.position="right") +
+                  scale_y_continuous(expand = c(0, 0)) + xlab("") + ylab("") +
+                  theme(panel.spacing = unit(0.4, "lines"),
+                        strip.text = element_text(colour = 'white'), strip.background = element_rect(fill="white", color="white"))
+
       }
 
       color_palette <- data_reactive()$colour.seqs
       color_palette["grey"] <- "grey"
 
       p <- p + scale_fill_manual(values = color_palette) +
-        #       theme(legend.position = "bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
-        theme(
-          axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)
-          # legend.position = "bottom", axis.text.x = element_blank(),
-          # strip.background = element_blank(), strip.text.x = element_blank()
-        )
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
     } else {
       p <- ggplot() +
         theme_bw() +
@@ -274,6 +303,7 @@ server <- function(input, output, session) {
   observeEvent(input$toggleFacetBtn, {
     facetActivated(!facetActivated()) # Toggle the state
   })
+
 
   observeEvent(input$toggleclusterBC, {
     clusterBCActivated()(!clusterBCActivated())
@@ -323,10 +353,12 @@ server <- function(input, output, session) {
 
 
   output$plotUI <- renderPlotly({
-    facet_height <- as.numeric(input$numInput)
+    facet_rows <- as.numeric(input$numInput)
+    facet_height <- as.numeric(input$numInputHeight)
     req(data_reactive()$plot_data) # Make sure there's data before plotting
     p <- reactivePlot()
-    p <- ggplotly(p, height=500*facet_height)
+    dynamic_number_val <- as.numeric(reactivePlot()$dynamic_number)
+    p <- ggplotly(p, height=facet_height*facet_rows, tooltip = "text")
     p %>% layout( margin = list(l = 50, r = 50))
   })
 }
