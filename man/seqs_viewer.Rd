@@ -4,7 +4,7 @@
 \alias{seqs_viewer}
 \title{Function run shiny app}
 \usage{
-seqs_viewer()
+seqs_viewer(default_folder = NULL)
 }
 \description{
 Function run shiny app

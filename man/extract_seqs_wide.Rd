@@ -9,7 +9,9 @@ extract_seqs_wide(
   type = "relative",
   clade = LETTERS[1:10],
   threshold = 0,
+  remove_zero = TRUE,
   drop_samples = NULL,
+  keep_samples = NULL,
   drop_seqs = NULL,
   silent = TRUE,
   ...
@@ -25,6 +27,8 @@ extract_seqs_wide(
 \item{threshold}{Set threshold to remove samples if less than the threshold (defaults to 1000)}
 
 \item{drop_samples}{drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")}
+
+\item{keep_samples}{drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")}
 
 \item{drop_seqs}{drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")}
 
