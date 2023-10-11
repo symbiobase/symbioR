@@ -4,7 +4,12 @@
 \alias{extract_fasta}
 \title{Function to extract fasta files from Symportal}
 \usage{
-extract_fasta(folder, type = "postmed")
+extract_fasta(
+  folder,
+  type = "postmed",
+  keep_samples = NULL,
+  drop_samples = NULL
+)
 }
 \arguments{
 \item{folder}{location of the root Symportal output}
