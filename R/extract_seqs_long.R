@@ -15,48 +15,91 @@
 #' @return A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 
 
-extract_seqs_long <-  function(folder, type = "relative", clade = LETTERS[1:10], remove_zero=TRUE, threshold = 0, drop_samples = NULL, keep_samples=NULL, drop_seqs = NULL, silent = TRUE) {
+extract_seqs_long <-  function(folder, type = "relative",
+                               onlyProfiles=FALSE, threshold = 7500, remove_zero=TRUE,
+                               drop_samples = NULL, keep_samples=NULL, drop_seqs = NULL) {
 
-  # get matches with dropped samples:
-  drop_samples_str <- ifelse(length(drop_samples) == 0, "NA_character_", paste(drop_samples, collapse = "|"))
-  keep_samples_str <- ifelse(length(keep_samples) == 0, "NA_character_", paste(keep_samples, collapse = "|"))
-  drop_seqs_str <- ifelse(length(drop_seqs) == 0, "NA_character_", paste(drop_seqs, collapse = "|"))
-
-  # read files
+  # read absolute abundances:
   file_list <- list.files(path = folder, pattern = "seqs.absolute.abund_and_meta.txt", include.dirs = TRUE, recursive = TRUE)
-
   full_data <- read.delim(paste0(folder, "/", file_list)) %>%
     dplyr::select(sample_name, 40:ncol(.)) %>% # select just the symbiodinium columns
     dplyr::slice(-dplyr::n()) # remove the last row, summary data
 
+  # read profiles
+  its2_profile <- extract_its2_profile(folder)
 
-  absolute <- full_data %>%
-    dplyr::select(sample_name, dplyr::matches(clade, ignore.case = FALSE)) %>% # keep only columns matching "clade"
-    dplyr::filter(dplyr::case_when(
-      drop_samples_str == "NA_character_" ~ TRUE, # drop rows by sample name
-      TRUE ~ !stringi::stri_detect_regex(sample_name, drop_samples_str, opts_regex = stringi::stri_opts_regex(case_insensitive = FALSE))
-    )) %>%
-    dplyr::filter(dplyr::case_when(
-      keep_samples_str == "NA_character_" ~ TRUE, # drop rows by sample name
-      TRUE ~ stringi::stri_detect_regex(sample_name, keep_samples_str, opts_regex = stringi::stri_opts_regex(case_insensitive = FALSE))
-    )) %>%
-    dplyr::select(-matches(drop_seqs_str, ignore.case = FALSE)) %>% # drop columns by seq name
-    # dplyr::filter(dplyr::case_when(drop_samples_str == "NA_character_" ~ TRUE, TRUE ~ !str_detect(sample_name, drop_samples_str))) %>% # drop rows by sample name
-    # dplyr::select(-matches(drop_seqs_str)) %>% # drop columns by seq name
-    dplyr::filter(rowSums(dplyr::select(., dplyr::where(is.numeric))) > as.numeric(threshold)) %>% # remove samples where <1000 sequences
+  ### absolute abundance
+  absolute <- full_data
 
+
+  # if (!is.null(metadata)) {
+  #
+  #   metadf <- read.csv(paste0(folder, "/", metadata)) |>
+  #     dplyr::select(sample_name, all_of(factors)) |>
+  #     rename(sample_name)
+  #
+  #
+  #   absolute <- left_join(absolute, metadf, by="sample.ID")
+  #
+  # }
+
+  # #columns matching "genus"
+  # if (!is.null(host_genus)) {
+  #
+  #   metadf_genus <- metadf |> filter(hostgenus %in% hostgenus)
+  #   print(head(metadf_genus))
+  #       absolute <- absolute %>%
+  #     filter(sample_name %in% its2_profile$sample.ID)
+  # }
+
+  #columns matching "onlyProfiles"
+  if (!is.null(onlyProfiles)) {
+   absolute <- absolute %>%
+     dplyr::filter(sample_name %in% its2_profile$sample.ID)
+  }
+
+  # Drop rows by sample name
+  if (!is.null(keep_samples)) {
+    absolute <- absolute %>% as.data.frame() %>%
+      dplyr::filter(grepl(paste(keep_samples, collapse = "|"), sample_name))
+    }
+
+  # Keep rows only with the sample names
+  if (!is.null(drop_samples)) {
+    absolute <- absolute %>% as.data.frame() %>%
+      dplyr::filter(!grepl(paste(drop_samples, collapse = "|"), sample_name))
+  }
+
+  # Drop columns by seq name partial match
+  # if (!is.null(drop_seqs)) {
+  #   absolute <- absolute %>%
+  #     dplyr::select(sample_name, !matches(paste(drop_seqs, collapse = "|"), ignore.case = FALSE))
+  # }
+
+  # Drop columns by seq name full match
+  if (!is.null(drop_seqs)) {
+    # Add "X" to strings that start with a number
+    drop_seqs <- ifelse(grepl("^\\d", drop_seqs), paste("X", drop_seqs, sep = ""), drop_seqs)
+    absolute <- absolute %>%
+      dplyr::select(-one_of(drop_seqs))
+  }
+
+  # threshold
+  drop_thresh <- data.frame(
+    sample_names=absolute$sample_name,
+    rowsums=rowSums(absolute[,2:ncol(absolute)])) |>
+    dplyr::filter(rowsums > threshold)
+
+  absolute <- absolute %>%
+    dplyr::filter(sample_name %in% drop_thresh$sample_names)
+
+  # tidy
+  absolute <- absolute %>%
     tibble::column_to_rownames("sample_name") %>% # sample_name column to rowname
     dplyr::filter(rowSums(dplyr::select(., dplyr::where(is.numeric))) != 0) %>% # drop zero sum rows
     dplyr::select(dplyr::where(~ sum(. != 0) > 0)) %>% # drop zero sum columns
     dplyr::select(dplyr::where(~ any(!is.na(.)))) # drop blank columns
 
-  excluded_samples <- !full_data$sample_name %in% row.names(absolute)
-  excluded_sample_names <- full_data$sample_name[excluded_samples]
-
-  if (silent == FALSE) {
-    cat("Excluded samples \n")
-    cat(paste0(" - ", excluded_sample_names, collapse = "\n"), " \n")
-  }
 
   relative <- absolute %>%
     dplyr::mutate(row_sum = rowSums(dplyr::select(., dplyr::where(is.numeric)))) %>%
@@ -83,21 +126,23 @@ extract_seqs_long <-  function(folder, type = "relative", clade = LETTERS[1:10],
     tibble::rownames_to_column("sample.ID") %>%
     tidyr::pivot_longer(cols = -sample.ID, names_to = "seq.ID", values_to = "abundance") %>%
     dplyr::filter(abundance>0.0001) %>%
-    dplyr::mutate(seq.ID = stringr::str_replace(seq.ID, "^X", "")) # drop X if first in seq.ID
+    dplyr::mutate(seq.ID = stringr::str_replace(seq.ID, "^X", "")) %>% # drop X if first in seq.ID
+    dplyr::group_by(sample.ID) |>
+    dplyr::arrange(desc(abundance))
 
   relative <- relative %>%
     tibble::rownames_to_column("sample.ID") %>%
     tidyr::pivot_longer(cols = -sample.ID, names_to = "seq.ID", values_to = "abundance") %>%
     dplyr::filter(abundance>0.0001) %>%
-    dplyr::mutate(seq.ID = stringr::str_replace(seq.ID, "^X", "")) # drop X if first in seq.ID
+    dplyr::mutate(seq.ID = stringr::str_replace(seq.ID, "^X", "")) %>% # drop X if first in seq.ID
+    dplyr::arrange(sample.ID, desc(abundance))
 
   if (remove_zero == TRUE) {
-    absolute <- absolute %>% filter(abundance != 0)
-    relative <- relative %>% filter(abundance != 0)
+    absolute <- absolute %>% dplyr::filter(abundance != 0)
+    relative <- relative %>% dplyr::filter(abundance != 0)
   }
 
   # return functions:
-
   if (type == "absolute") {
     return(absolute)
   } else if (type == "relative") {

@@ -4,18 +4,28 @@
 \alias{plot_postmed_rel}
 \title{Function to plot sequences from symportal output}
 \usage{
-plot_postmed_rel(folder)
+plot_postmed_rel(
+  folder,
+  plotly = FALSE,
+  format,
+  metadata,
+  factors,
+  facet = NULL,
+  ...
+)
 }
 \arguments{
 \item{folder}{location of the root Symportal output}
 
-\item{type}{returns either "relative" or "absolute"}
+\item{format}{returns either "relative" or "absolute"}
 
 \item{metadata}{name of metadata file (e.g. "metadata_20230120T102936.csv") within the Symportal output folder}
 
 \item{factors}{list of columns for the metadata}
 
 \item{...}{passes functions}
+
+\item{order}{order by factor level}
 }
 \description{
 Function to plot sequences from symportal output
