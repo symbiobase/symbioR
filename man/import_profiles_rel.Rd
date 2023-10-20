@@ -4,12 +4,14 @@
 \alias{import_profiles_rel}
 \title{Function to extract sequences from symportal output}
 \usage{
-import_profiles_rel(folder)
+import_profiles_rel(folder, metadata, factors)
 }
 \arguments{
 \item{folder}{location of the root Symportal output}
 
-\item{type}{returns either "relative" or "absolute"}
+\item{metadata}{name of metadata file (e.g. "metadata_20230120T102936.csv") within the Symportal output folder}
+
+\item{factors}{list of columns for the metadata}
 }
 \description{
 same as extract_seqs but in long format

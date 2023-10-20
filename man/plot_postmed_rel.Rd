@@ -10,6 +10,12 @@ plot_postmed_rel(folder)
 \item{folder}{location of the root Symportal output}
 
 \item{type}{returns either "relative" or "absolute"}
+
+\item{metadata}{name of metadata file (e.g. "metadata_20230120T102936.csv") within the Symportal output folder}
+
+\item{factors}{list of columns for the metadata}
+
+\item{...}{passes functions}
 }
 \description{
 Function to plot sequences from symportal output

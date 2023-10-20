@@ -4,10 +4,14 @@
 \alias{import_postmed_abs}
 \title{Function to extract postmed sequences from symportal output}
 \usage{
-import_postmed_abs(folder, format = "long", ...)
+import_postmed_abs(folder, metadata, factors, format, ...)
 }
 \arguments{
 \item{folder}{location of the root Symportal output}
+
+\item{metadata}{name of metadata file (e.g. "metadata_20230120T102936.csv") within the Symportal output folder}
+
+\item{factors}{list of columns for the metadata}
 
 \item{type}{"relative" or "absolute"}
 }
