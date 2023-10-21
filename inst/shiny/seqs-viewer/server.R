@@ -295,15 +295,21 @@ server <- function(input, output, session) {
        }
 
        if (input$facetType == "Host Species") {
-          p <- p +  facet_wrap(~host_species, ncol = 2, scales = "free_x", strip.position="right")
+          p <- p +  facet_wrap(~host_species, nrow = as.numeric(input$numInputNrow), scales = "free_x", strip.position="right") +
+            theme(panel.spacing = unit(0.4, "lines"), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                  strip.background = element_rect(fill="white", color="white"))
        }
 
       if (input$facetType == "Host Genus") {
-        p <- p +  facet_wrap(~host_genus, ncol = 1, scales = "free_x", strip.position="right")
+        p <- p +  facet_wrap(~host_genus,nrow = as.numeric(input$numInputNrow), scales = "free_x", strip.position="right") +
+          theme(panel.spacing = unit(0.4, "lines"), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                strip.background = element_rect(fill="white", color="white"))
       }
 
         if (input$facetType == "Location") {
-          p <- p +  facet_wrap(~collection_location, ncol = 1, scales = "free_x", strip.position="right")
+          p <- p +  facet_wrap(~collection_location,  nrow = as.numeric(input$numInputNrow), scales = "free_x", strip.position="right") +
+            theme(panel.spacing = unit(0.4, "lines"), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                  strip.background = element_rect(fill="white", color="white"))
         }
 
       color_palette <- data_reactive()$colour.seqs

@@ -224,7 +224,27 @@ div(class = "sidebox",
     tags$p("Choose facet panels:"),
 
     selectInput("facetType", "Facet by:", c("Normal", "Host Species", "Host Genus", "Location")),
-    tableOutput("tableDataFacet")
+    tableOutput("tableDataFacet"),
+
+#
+#     div(
+#       style = "display: inline-block; width: 40%;",
+#       numericInput("numInputNcol", "Enter a number:", value = 2, min = 1, max = 10, step = 1),
+#     ),
+#     div(
+#       style = "display: inline-block; width: 40%;",
+#       tags$p(" ncol"),
+#     ),
+
+
+    div(
+      style = "display: inline-block; width: 40%;",
+      numericInput("numInputNrow", "Enter a number:", value = 1, min = 1, max = 10, step = 1),
+    ),
+    div(
+      style = "display: inline-block; width: 40%;",
+      tags$p(" nrow"),
+    ),
 ),
 
 div(class = "sidebox-break"),
