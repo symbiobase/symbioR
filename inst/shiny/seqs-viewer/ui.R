@@ -119,37 +119,13 @@ fluidPage(
       padding: 5px 25px;
       #margin-left: 10px;
   }
-   #toggleclusterBC {
-      background-color: #C4E3E8;
-      border: 1px solid darkgrey;
-      font-size: 11px;
-      padding: 8px;
-      #margin-left: 4px;
-   }
-   #toggleclusterEU {
-      background-color: #C3D2E5;
-      border: 1px solid darkgrey;
-      font-size: 11px;
-      padding: 8px;
-      #margin-left: 4px;
-   }
-   #toggleclusterJC {
-      background-color: #C6E5C3;
-      border: 1px solid darkgrey;
-      font-size: 11px;
-      padding: 8px 12px;
-      #margin-left: 4px;
-  }
   .shiny-notification {
     font-size: 20px;
   }
 ")),
+
 #-------------------- sidebar --------------------------@
-      # div(class="sidebox",
-      #     tags$h2("seq*sample viewer"),
-      # ),
-      # div(class="sidebox-break",
-      # ),
+
       #-------------------- Specify folder --------------------------@
       div(class="sidebox",
           tags$h3("Select folder:"),
@@ -201,49 +177,56 @@ fluidPage(
       ),
       div(class="sidebox-break",
       ),
-      #-------------------- Facet --------------------------@
-      div(class="sidebox",
-          tags$h3("Facet"),
-          tags$p("Wrap the number of rows for large datasets"),
 
-          div(
-            style = "display: inline-block; width: 25%;",
-            numericInput("numInput", "Enter a number:", value = 1, min = 1),
-          ),
+#-------------------- Facet --------------------------@
+div(class = "sidebox",
+    tags$h3("Facet"),
+    tags$p("Wrap the number of rows for large datasets"),
 
-          div(
-            style = "display: inline-block; width: 40%;",
-            tags$p(" rows"),
-          ),
+    div(
+      style = "display: inline-block; width: 25%;",
+      numericInput("numInput", "Enter a number:", value = 1, min = 1),
+    ),
 
-          tags$br(),
+    div(
+      style = "display: inline-block; width: 40%;",
+      tags$p(" rows"),
+    ),
 
-          div(
-            style = "display: inline-block; width: 40%;",
-            numericInput("numInputHeight", "Enter a number:", value = 500, min = 100, max=1200, step=50),
-          ),
+    tags$br(),
 
-          div(
-            style = "display: inline-block; width: 40%;",
-            tags$p(" row height"),
-          ),
+    div(
+      style = "display: inline-block; width: 40%;",
+      numericInput("numInputHeight", "Enter a number:", value = 500, min = 100, max = 1200, step = 50),
+    ),
 
-      ),
-      div(class="sidebox-break",
-      ),
+    div(
+      style = "display: inline-block; width: 40%;",
+      tags$p(" row height"),
+    ),
+
+    tags$h3("Facet by:"),
+    tags$p("Choose panel levels:"),
+
+    selectInput("facetType", "Facet by:", c("Normal", "Host Species", "Host Genus", "Location")),
+    tableOutput("tableDataFacet")
+),
+
+div(class = "sidebox-break"),
+
+#-------------------- type --------------------------@
+div(class = "sidebox",
+    tags$h3("Cluster samples:"),
+    tags$p("Add groupings for samples based on cluster analysis of seqID per sample"),
+
+    selectInput("orderType", "Sample clustering:", c("normal", "Bray-Curtis", "Euclidean", "Jaccard", "Hellingers")),
+    tableOutput("tableData")
+),
+
+div(class = "sidebox-break"),
 
 
-      #-------------------- type --------------------------@
-      div(class="sidebox",
-        tags$h3("Cluster samples:"),
-        tags$p("Add groupings for samples based on cluster analysis of seqID per sample"),
-        ui <- fluidPage(
-          selectInput("orderType", "Sample clustering:", c("normal", "Bray-Curtis", "Euclidean", "Jaccard", "Hellingers")),
-          tableOutput("tableData")
-        )
-      ),
-      div(class="sidebox-break",
-      ),
+
       #-------------------- Save Functions --------------------------@
       div(class="sidebox",
         tags$h3("Save Plot to folder:"),

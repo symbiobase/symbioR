@@ -20,6 +20,7 @@ server <- function(input, output, session) {
   clusterEUActivated <- reactiveVal(FALSE)
   clusterJCActivated <- reactiveVal(FALSE)
   abundanceType <- reactiveVal("Relative") # default value
+  facetType <- reactiveVal("Normal") # default value
 
   #-------------------- Get shiny volumes --------------------------@
 
@@ -38,7 +39,16 @@ server <- function(input, output, session) {
     plot_data_new2 <- extract_seqs_wide(folder_path, type = "absolute")
     colour.seqs_new <- extract_plot_colors(folder_path)
     its2.type.names_new <- extract_its2_names(folder_path)
-      metadata_new <- extract_metadata(folder_path) %>% dplyr::select("sample.ID", "sample_uid", "host_genus", "host_species", "collection_longitude", "collection_latitude")
+    #metadata_new <- extract_metadata(folder_path) %>% dplyr::select("sample.ID", "sample_uid", "host_genus", "host_species", "collection_longitude", "collection_latitude")
+
+    metafile_path <- paste0(folder_path, "/newmeta.csv")
+    if (file.exists(metafile_path)) {
+      metadata_new <- read.csv(metafile_path)
+    } else {
+
+      cat("No additional metadata selected. \n")
+
+    }
 
     data_vals(list(plot_data = plot_data_new, plot_data_2 = plot_data_new2, colour.seqs = colour.seqs_new, its2.type.names = its2.type.names_new))
   }
@@ -77,7 +87,6 @@ server <- function(input, output, session) {
     ggplotly(p)
   })
 
-  #-------------------- seq and sample.id --------------------------@
 
   output$seqID_ui <- renderUI({
     selectInput("seqID", "Select seq.ID:",
@@ -186,7 +195,6 @@ server <- function(input, output, session) {
     ### update order by dissimilarity index
 
     if (input$orderType == "Bray-Curtis") {
-
       hclust_bray <- hclust(vegdist(decostand(dist_data,"total"), "bray"))
       updated_order_bray <- hclust_bray$order
       hclust_bray_order <- hclust_bray$labels[updated_order_bray]
@@ -194,7 +202,6 @@ server <- function(input, output, session) {
       filtered_data <- filtered_data %>%
         mutate(sample.ID = factor(sample.ID, levels = hclust_bray_order)) %>%
         arrange(sample.ID)
-
 
     }
     if (input$orderType == "Euclidean") {
@@ -237,7 +244,6 @@ server <- function(input, output, session) {
 
       dynamic_number <- as.numeric(input$numInput)
 
-
       create_facet_column <- function(df, n) {
         df %>%
           group_by(sample.ID) %>%
@@ -250,7 +256,6 @@ server <- function(input, output, session) {
 
       filtered_data <- create_facet_column(filtered_data, dynamic_number)
 
-
     #-------------------- initialise plot  --------------------------@
 
 
@@ -260,6 +265,7 @@ server <- function(input, output, session) {
                   aes(x = sample.ID, y = abundance,
                       text = (paste(
                         "Species: ", host_species,
+                        "Genus: ", host_genus,
 #                        "<br>lon/lat: ", paste0("[",round(collection_longitude,1),"] [", round(collection_latitude,1),"]"),
                         "<br>Latitude: ", round(collection_latitude,2),
                         "<br>Seq.ID:", seq.ID,
@@ -270,19 +276,35 @@ server <- function(input, output, session) {
 
       if (abundanceType() == "Relative") {
         p <- p + geom_bar(color = "black", linewidth = 0.1, show.legend = FALSE, stat = "identity",  position = position_fill(reverse = TRUE)) +
-                  facet_wrap(~facet_column, ncol = 1, scales = "free_x", strip.position="right") +
-                  scale_y_reverse(breaks=seq(0,1,0.2), expand = c(0, 0)) + xlab("") + ylab("") +
-                  theme(panel.spacing = unit(0.4, "lines"), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                        strip.text = element_text(colour = 'white'), strip.background = element_rect(fill="white", color="white"))
+                  #facet_wrap(~facet_column, ncol = 1, scales = "free_x", strip.position="right") +
+                  scale_y_reverse(breaks=seq(0,1,0.2), expand = c(0, 0)) + xlab("") + ylab("")
       } else {
         p <- p +
               geom_bar(color = "black", linewidth = 0.1, show.legend = FALSE, stat = "identity") +
-                  facet_wrap(~facet_column, ncol = 1, scales = "free_x", strip.position="right") +
-                  scale_y_continuous(expand = c(0, 0)) + xlab("") + ylab("") +
-                  theme(panel.spacing = unit(0.4, "lines"),
-                        strip.text = element_text(colour = 'white'), strip.background = element_rect(fill="white", color="white"))
+                  #facet_wrap(~facet_column, ncol = 1, scales = "free_x", strip.position="right") +
+                  scale_y_continuous(expand = c(0, 0)) + xlab("") + ylab("")
 
       }
+
+
+      #print(head(filtered_data))
+       if (input$facetType == "Normal") {
+        p <- p +  facet_wrap(~facet_column, ncol = 1, scales = "free_x", strip.position="right") +
+           theme(panel.spacing = unit(0.4, "lines"), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                strip.text = element_text(colour = 'white'), strip.background = element_rect(fill="white", color="white"))
+       }
+
+       if (input$facetType == "Host Species") {
+          p <- p +  facet_wrap(~host_species, ncol = 2, scales = "free_x", strip.position="right")
+       }
+
+      if (input$facetType == "Host Genus") {
+        p <- p +  facet_wrap(~host_genus, ncol = 1, scales = "free_x", strip.position="right")
+      }
+
+        if (input$facetType == "Location") {
+          p <- p +  facet_wrap(~collection_location, ncol = 1, scales = "free_x", strip.position="right")
+        }
 
       color_palette <- data_reactive()$colour.seqs
       color_palette["grey"] <- "grey"
@@ -304,31 +326,22 @@ server <- function(input, output, session) {
     facetActivated(!facetActivated()) # Toggle the state
   })
 
-
-  observeEvent(input$toggleclusterBC, {
-    clusterBCActivated()(!clusterBCActivated())
-  })
-
-  observeEvent(input$toggleclusterEU, {
-    clusterEUActivated()(!clusterEUActivated())
-  })
-
-  observeEvent(input$toggleclusterJC, {
-    clusterJCActivated()(!clusterJCActivated())
-  })
-
+  ### Event relative
   observeEvent(input$relativeBtn, {
     abundanceType("Relative")
   })
 
+  ### Event absolute
   observeEvent(input$absoluteBtn, {
     abundanceType("Absolute")
   })
 
+  ### Event absolute grey
   observeEvent(input$toggleGrey, {
     greyFilterActivated(!greyFilterActivated()) # toggle the state
   })
 
+  ### Event saveplot
   observeEvent(input$savePlotBtn, {
     folder_path <- input$saveFolderInput
     file_name <- input$filenameInput
