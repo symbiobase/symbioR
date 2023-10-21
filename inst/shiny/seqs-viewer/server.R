@@ -371,7 +371,7 @@ server <- function(input, output, session) {
     req(data_reactive()$plot_data) # Make sure there's data before plotting
     p <- reactivePlot()
     dynamic_number_val <- as.numeric(reactivePlot()$dynamic_number)
-    p <- ggplotly(p, height=facet_height*facet_rows, tooltip = "text")
+    p <- ggplotly(p, width=as.numeric(input$numInputWidth), height=facet_height*facet_rows, tooltip = "text")
     p %>% layout( margin = list(l = 50, r = 50))
   })
 }

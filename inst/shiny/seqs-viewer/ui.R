@@ -180,8 +180,8 @@ fluidPage(
 
 #-------------------- Facet --------------------------@
 div(class = "sidebox",
-    tags$h3("Facet"),
-    tags$p("Wrap the number of rows for large datasets"),
+    tags$h3("Split rows"),
+    tags$p("Split samples across rows for large datasets"),
 
     div(
       style = "display: inline-block; width: 25%;",
@@ -205,8 +205,23 @@ div(class = "sidebox",
       tags$p(" row height"),
     ),
 
+    div(
+      style = "display: inline-block; width: 40%;",
+      numericInput("numInputWidth", "Enter a number:", value = 900, min = 200, max = 10000, step = 100),
+    ),
+    div(
+      style = "display: inline-block; width: 40%;",
+      tags$p(" plot width"),
+    ),
+
+),
+
+div(class = "sidebox-break"),
+
+div(class = "sidebox",
+
     tags$h3("Facet by:"),
-    tags$p("Choose panel levels:"),
+    tags$p("Choose facet panels:"),
 
     selectInput("facetType", "Facet by:", c("Normal", "Host Species", "Host Genus", "Location")),
     tableOutput("tableDataFacet")
