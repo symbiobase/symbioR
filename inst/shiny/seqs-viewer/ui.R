@@ -183,6 +183,10 @@ div(class = "sidebox",
     tags$h3("Split rows"),
     tags$p("Split samples across rows for large datasets"),
 
+    selectInput("facetType", "Facet by:", c("Normal", "Host Species", "Host Genus", "Location")),
+    tableOutput("tableDataFacet"),
+
+
     div(
       style = "display: inline-block; width: 25%;",
       numericInput("numInput", "Enter a number:", value = 1, min = 1),
@@ -216,36 +220,7 @@ div(class = "sidebox",
 
 ),
 
-div(class = "sidebox-break"),
 
-div(class = "sidebox",
-
-    tags$h3("Facet by:"),
-    tags$p("Choose facet panels:"),
-
-    selectInput("facetType", "Facet by:", c("Normal", "Host Species", "Host Genus", "Location")),
-    tableOutput("tableDataFacet"),
-
-#
-#     div(
-#       style = "display: inline-block; width: 40%;",
-#       numericInput("numInputNcol", "Enter a number:", value = 2, min = 1, max = 10, step = 1),
-#     ),
-#     div(
-#       style = "display: inline-block; width: 40%;",
-#       tags$p(" ncol"),
-#     ),
-
-
-    div(
-      style = "display: inline-block; width: 40%;",
-      numericInput("numInputNrow", "Enter a number:", value = 1, min = 1, max = 10, step = 1),
-    ),
-    div(
-      style = "display: inline-block; width: 40%;",
-      tags$p(" nrow"),
-    ),
-),
 
 div(class = "sidebox-break"),
 

@@ -289,25 +289,25 @@ server <- function(input, output, session) {
 
       #print(head(filtered_data))
        if (input$facetType == "Normal") {
-        p <- p +  facet_wrap(~facet_column, ncol = 1, scales = "free_x", strip.position="right") +
+        p <- p +  facet_wrap(~facet_column, nrow = as.numeric(input$numInput), scales = "free_x", strip.position="right") +
            theme(panel.spacing = unit(0.4, "lines"), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                 strip.text = element_text(colour = 'white'), strip.background = element_rect(fill="white", color="white"))
        }
 
        if (input$facetType == "Host Species") {
-          p <- p +  facet_wrap(~host_species, nrow = as.numeric(input$numInputNrow), scales = "free_x", strip.position="right") +
+          p <- p +  facet_wrap(~host_species, nrow = as.numeric(input$numInput), scales = "free_x", strip.position="right") +
             theme(panel.spacing = unit(0.4, "lines"), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                   strip.background = element_rect(fill="white", color="white"))
        }
 
       if (input$facetType == "Host Genus") {
-        p <- p +  facet_wrap(~host_genus,nrow = as.numeric(input$numInputNrow), scales = "free_x", strip.position="right") +
+        p <- p +  facet_wrap(~host_genus,nrow = as.numeric(input$numInput), scales = "free_x", strip.position="right") +
           theme(panel.spacing = unit(0.4, "lines"), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                 strip.background = element_rect(fill="white", color="white"))
       }
 
         if (input$facetType == "Location") {
-          p <- p +  facet_wrap(~collection_location,  nrow = as.numeric(input$numInputNrow), scales = "free_x", strip.position="right") +
+          p <- p +  facet_wrap(~collection_location,  nrow = as.numeric(input$numInput), scales = "free_x", strip.position="right") +
             theme(panel.spacing = unit(0.4, "lines"), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                   strip.background = element_rect(fill="white", color="white"))
         }
