@@ -54,15 +54,15 @@ extract_seqs_long <-  function(folder, type = "relative",
 
   #columns matching "onlyProfiles"
   if (!is.null(onlyProfiles)) {
-    absolute <- absolute %>%
-      dplyr::filter(sample_name %in% its2_profile$sample.ID)
+   absolute <- absolute %>%
+     dplyr::filter(sample_name %in% its2_profile$sample.ID)
   }
 
   # Drop rows by sample name
   if (!is.null(keep_samples)) {
     absolute <- absolute %>% as.data.frame() %>%
       dplyr::filter(grepl(paste(keep_samples, collapse = "|"), sample_name))
-  }
+    }
 
   # Keep rows only with the sample names
   if (!is.null(drop_samples)) {

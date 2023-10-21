@@ -4,26 +4,14 @@
 \alias{plot_seqs2}
 \title{Function to plot seq.IDs per sample and hierarchical clustering of sample order with dendrogram}
 \usage{
-plot_seqs2(
-  folder,
-  format = "ggplot",
-  type = "relative",
-  onlyProfiles = FALSE,
-  threshold = 0,
-  remove_zero = TRUE,
-  drop_samples = NULL,
-  keep_samples = NULL,
-  drop_seqs = NULL,
-  silent = TRUE,
-  ...
-)
+plot_seqs2(input, folder, format = "ggplot", facet = TRUE)
 }
 \arguments{
 \item{folder}{location of the root Symportal output}
 
 \item{type}{returns either "relative" or "absolute"}
 
-\item{threshold}{Set threshold to remove samples if less than the threshold (defaults to 1000)}
+\item{clade}{filter by single "C" or multiple clades c("C", "D") to filter sequences by}
 
 \item{drop_samples}{drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")}
 
@@ -31,11 +19,11 @@ plot_seqs2(
 
 \item{drop_seqs}{drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")}
 
+\item{threshold}{Set threshold to remove samples if less than the threshold (defaults to 1000)}
+
 \item{silent}{defaults to TRUE, if FALSE then prints a list of removed sample names}
 
 \item{...}{pass}
-
-\item{clade}{filter by single "C" or multiple clades c("C", "D") to filter sequences by}
 }
 \value{
 ggplot and dendrogram for seqs/samples
