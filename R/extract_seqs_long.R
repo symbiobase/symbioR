@@ -16,7 +16,7 @@
 
 
 extract_seqs_long <-  function(folder, type = "relative",
-                               onlyProfiles=FALSE, threshold = 7500, remove_zero=TRUE,
+                               onlyProfiles=FALSE, threshold = 1, remove_zero=FALSE,
                                drop_samples = NULL, keep_samples=NULL, drop_seqs = NULL) {
 
   # read absolute abundances:
@@ -53,7 +53,7 @@ extract_seqs_long <-  function(folder, type = "relative",
   # }
 
   #columns matching "onlyProfiles"
-  if (!is.null(onlyProfiles)) {
+  if (is.null(onlyProfiles)) {
     absolute <- absolute %>%
       dplyr::filter(sample_name %in% its2_profile$sample.ID)
   }

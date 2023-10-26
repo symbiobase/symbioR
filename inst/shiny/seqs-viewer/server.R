@@ -61,13 +61,14 @@ server <- function(input, output, session) {
     # Check if folder has been properly selected
     if (length(folder) > 0) {
       folder_path <- as.character(folder)
-      print(folder_path) # For debugging
+      #print(folder_path) # For debugging
+      print(unique(filtered_data$sample.ID))
 
       plot_data_new <- extract_seqs_long(folder_path, type = "absolute")
       plot_data_new2 <- extract_seqs_wide(folder_path, type = "absolute")
       colour.seqs_new <- extract_plot_colors(folder_path)
       its2.type.names_new <- extract_its2_names(folder_path)
-      metadata_new <- extract_metadata(folder_path)
+      #metadata_new <- extract_metadata(folder_path)
 
 
       data_vals(list(plot_data = plot_data_new, plot_data_2 = plot_data_new2, colour.seqs = colour.seqs_new, its2.type.names = its2.type.names_new))
@@ -171,7 +172,12 @@ server <- function(input, output, session) {
 
     #-------------------- join metadata  --------------------------@
 
-    filtered_data <- left_join(filtered_data, metadata_new, by="sample.ID")
+    if (file.exists(metafile_path)) {
+      filtered_data <- left_join(filtered_data, metadata_new, by="sample.ID")
+    } else {
+
+    }
+
 
     #-------------------- calculate relative abundance for text labels  --------------------------@
 
@@ -264,10 +270,10 @@ server <- function(input, output, session) {
       p <- ggplot(data = filtered_data,
                   aes(x = sample.ID, y = abundance,
                       text = (paste(
-                        "Species: ", host_species,
-                        "Genus: ", host_genus,
+                        #"Species: ", host_species,
+                        #"Genus: ", host_genus,
 #                        "<br>lon/lat: ", paste0("[",round(collection_longitude,1),"] [", round(collection_latitude,1),"]"),
-                        "<br>Latitude: ", round(collection_latitude,2),
+                        #"<br>Latitude: ", round(collection_latitude,2),
                         "<br>Seq.ID:", seq.ID,
                         "<br>Abundance: ", abundance,
                         "<br>Proportion: ", round(proportion,2))),
