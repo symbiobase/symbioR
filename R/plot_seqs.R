@@ -14,7 +14,7 @@
 #' @return A data.frame of seq_ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 
 
-plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet = NULL, seq.order=TRUE, ...) {
+plot_seqs <- function(input, folder, cols, type = "ggplot", cluster = "none", nrow=NULL, facet = NULL, seq.order=TRUE, ...) {
 
   #folder=folder_path
 
@@ -126,7 +126,8 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
     ggplot2::scale_fill_manual(values = colour.seqs_new) +
     ggplot2::xlab("") +
     ggplot2::ylab("") +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1))
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+    ggplot2::theme(legend.position = "none")
 #
 #
 #   if (!is.null(order)) {
@@ -171,7 +172,8 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
             data = input,
             ggplot2::aes(x = sample_name, y = abundance, fill = factor(seq_ID, levels=dominant.seqs), group = factor(seq_ID, levels=dominant.seqs))
           ) +
-          ggplot2::scale_y_reverse()
+          ggplot2::scale_y_reverse() +
+          ggplot2::theme(legend.position = "none")
 
 
       }
@@ -192,14 +194,15 @@ plot_seqs <- function(input, type = "ggplot", cluster = "none", nrow=NULL, facet
       ggplot2::ylab("") +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1)) +
       ggplot2::facet_wrap(~ facet_column, nrow=nrow, scales = "free_x") +
-      ggplot2::theme(panel.spacing = unit(2, "cm", data = NULL))
+      ggplot2::theme(panel.spacing = unit(2, "cm", data = NULL)) +
+      ggplot2::theme(legend.position = "none")
     }
 
 
   #--------------------------------------------#
   if (!is.null(facet)) {
     p <- p +
-      ggplot2::facet_wrap(~ get(facet), scales = "free_x") + ggplot2::xlab("")
+      ggplot2::facet_wrap(~ get(facet), scales = "free_x") + ggplot2::xlab("") + ggplot2::theme(legend.position = "none")
   }
   #--------------------------------------------#
 

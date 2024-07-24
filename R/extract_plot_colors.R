@@ -6,7 +6,7 @@
 #' @export
 #' @return list of colors for plotting
 
-extract_plot_colors <- function(folder){
+extract_plot_colors <- function(folder, ...){
 
   file_list <- list.files(path = folder, pattern = "color_dict_post_med.json", include.dirs = TRUE, recursive = TRUE)
 

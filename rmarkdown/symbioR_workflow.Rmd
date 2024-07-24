@@ -1,20 +1,32 @@
 ---
-title: "tidyseqs workflow"
+title: "symbioR workflow for symportal output"
 date: "2023-10-23"
 ---
 
-
-## R Markdown
+Example workflow with Symportal output.
 
 Set folder path and seed:
 
-```{r }
+```{r, include=FALSE}
+devtools::load_all()
 library(tidyverse)
 library(symbioR)
+
 
 set.seed(1)
 
 folder_path <- ("/Users/rof011/symbiodinium/20230120T102936_esampayo")
+```
+
+```{r, include=TRUE, eval=FALSE}
+library(tidyverse)
+library(symbioR)
+
+
+set.seed(1)
+
+folder_path <- ("/Users/rof011/symbiodinium/20230120T102936_esampayo")
+
 ```
 
 
@@ -43,7 +55,7 @@ make up some metadata and add it to the file
 
 meta_sim <- data.frame(sample_name = unique(sequences$sample_name),
                        host_genera = sample(c("Acropora", "Pocillopora", "Stylophora", "Merulina"), length(unique(sequences$sample_name)), replace = TRUE),
-                       location = sample(c("Paris", "New York", "Milan", "Den Haag"), length(unique(sequences$sample_name)), replace = TRUE),
+                       location = sample(c("Heron", "Lizard", "Keppel", "Orpheus"), length(unique(sequences$sample_name)), replace = TRUE),
                        latitude = sampled_numbers <- sample(-10:-30, length(unique(sequences$sample_name)), replace = TRUE))
 
 
@@ -105,7 +117,7 @@ Note partial matching doesn't work with seq.ID - e.g. selecting "C3" would remov
 sequences <- extract_seqs(folder_path) |>
              filter_seqs(drop_seqs=c("C3xe","C3xe","C1","C3ih"))
 
-unique(sequences$seq.ID)
+unique(sequences$seq_ID)
 
 ```
 
@@ -177,7 +189,7 @@ sequences <- extract_seqs(folder_path, type="absolute") |>
 
 ```
 
-### 3. Quality control:
+## 3. Quality control:
 
 ### a) compare sample lists
 
@@ -221,15 +233,18 @@ If you pass relative abundance data from extract_seqs() and try to filter by thr
 
 ```
 
-### 4. plot the data:
+## 4. Visualise sequences
+
+### a) filter and plot
+
 
 Plot the raw data (note - this has to be in a pipe as plot_seqs needs the folder from extract_seqs to get the colors)
 
-```{r}
+```{r, fig.width=10, fig.height=3}
 
 
-plot_data <- extract_seqs(folder_path, type="relative") |> 
-              plot_seqs(type="ggplot")
+plot_data <- extract_seqs(folder=folder_path, type="relative") %>% 
+              plot_seqs(folder=folder_path, type="ggplot")
 
 plot_data
 
@@ -240,57 +255,61 @@ plot_data
 
 Add filter_seqs before the plot to select what to view:
 
-```{r}
+```{r, fig.width=5, height=3}
 
 
-plot_data <- extract_seqs(folder_path) |>
-             filter_seqs(threshold = 5000) |> 
-             filter_seqs(keep_samples = "AU18_02") |> 
-             plot_seqs(type="ggplot")
+plot_data <- extract_seqs(folder_path) %>%
+             filter_seqs(threshold = 5000) %>%
+             filter_seqs(keep_samples = "AU18_02") %>% 
+             plot_seqs(folder_path, type="ggplot")
 
 plot_data
 
 
 ```
+### b) order output by cluster 
+
 
 cluster samples by either "bray-curtis", "euclidean", "jaccard", "hellinger", save using ggsave
 
-```{r}
+```{r, fig.width=6, fig.height=3}
 
 
 plot_data <- extract_seqs(folder_path, meta_sim) |>
              filter_seqs(threshold = 1000) |> 
              filter_seqs(keep_samples = "AU18_02") |> 
-             plot_seqs(type="ggplot", cluster="hellinger")
+             plot_seqs(folder_path, type="ggplot", cluster="hellinger")
 
 plot_data
 
 
 ```
 
+### c) facet panels 
 
 Add facet_wrap or facet_grid by using standard ggplot code:
 
-```{r}
+```{r, fig.width=10, fig.height=8}
 
 
 plot_data <- extract_seqs(folder_path, meta_sim) |>
              filter_seqs(threshold = 1000) |> 
-             plot_seqs(type="ggplot", facet="host_genera") 
+             plot_seqs(folder_path, type="ggplot", facet="host_genera") 
 
 plot_data
 
 
 ```
 
+### d) order output by cluster 
 
 plot with plotly instead of ggplot for dynamic plots:
 
-```{r}
+```{r,  fig.width=10, fig.height=8}
 
 plot_data <- extract_seqs(folder_path, meta_sim) |>
              filter_seqs(threshold = 2000) |> 
-             plot_seqs(type="plotly", cluster="hellinger", facet="location") 
+             plot_seqs(folder_path, type="plotly", cluster="hellinger", facet="location") 
 
 plot_data
 
@@ -299,13 +318,15 @@ plot_data
 
 
 
-Split a large dataset using nrow (note: can't be used with facet)
+### e) split datasets by row: 
 
-```{r, fig.height=18, fig.width=12}
+To avoid wide plots, split large datasets using nrow:
+
+```{r, fig.height=16, fig.width=8}
   
-plot_data <- extract_seqs(folder=folder_path, meta_sim) %>%
+plot_data <- extract_seqs(folder_path, meta_sim) %>%
              filter_seqs(threshold = 2000) %>%
-             plot_seqs(type="plotly", cluster="hellinger", nrow=4) 
+             plot_seqs(folder_path, type="plotly", cluster="hellinger", nrow=4) 
 
 plot_data
 
