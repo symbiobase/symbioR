@@ -1,9 +1,10 @@
 #' Function to extract colors for plots from Symportal
 #'
+#'  internal function
+#'
 #' @param folder location of the root Symportal output
 #' @export
-#' @return its_profile A data.frame of ITS profiles for each sample.ID
-
+#' @return list of colors for plotting
 
 extract_plot_colors <- function(folder){
 

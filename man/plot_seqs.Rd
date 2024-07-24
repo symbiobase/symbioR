@@ -2,20 +2,36 @@
 % Please edit documentation in R/plot_seqs.R
 \name{plot_seqs}
 \alias{plot_seqs}
-\title{Function to plot seq.IDs per sample and hierarchical clustering of sample order with dendrogram}
+\title{plot_seqs}
 \usage{
-plot_seqs(folder, ...)
+plot_seqs(
+  input,
+  type = "ggplot",
+  cluster = "none",
+  nrow = NULL,
+  facet = NULL,
+  seq.order = TRUE,
+  ...
+)
 }
 \arguments{
-\item{folder}{location of the root Symportal output}
+\item{input}{input file of sequences and samples (e.g. from extract_seqs)}
 
-\item{type}{one of "relative" or "absolute"}
+\item{type}{standard plots ("ggplot") or interactive plots ("plotly")}
 
-\item{dist}{a distance matrix method from vegan, see ?vegdist for details}
+\item{cluster}{optional clustering of sample names by dissimilarity index, one of "bray-curtis", "euclidean", "jaccard", "hellinger", or default ("none")}
+
+\item{facet}{TRUE/FALSE to facet output, null by default}
+
+\item{seq.order}{TRUE/FALSE, organise stacked bars by dominant sequences (abundances)}
+
+\item{ncol}{number of rows to facet}
 }
 \value{
-ggplot and dendrogram for seqs/samples
+A data.frame of seq_ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 }
 \description{
-Function to plot seq.IDs per sample and hierarchical clustering of sample order with dendrogram
+quick visualisation of sequences clustered by sample name either with ggplot or plotly with
+options to organise samples by outputs of cluster analysis for sample dissimilarity, organise
+sequences by relative abundance, and set the number of columns and rows for large sample sizes
 }

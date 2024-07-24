@@ -12,8 +12,8 @@ extract_its2_profile(folder, type = "absolute")
 \item{type}{relative or absolute}
 }
 \value{
-its_profile A data.frame of ITS profiles for each sample.ID
+its_profile A data.frame of ITS profiles for each sample_name
 }
 \description{
-.  REDUNDANT - replaced by extract_postmed_seqs()
+.
 }

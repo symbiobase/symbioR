@@ -6,32 +6,37 @@
 \usage{
 extract_seqs(
   folder,
-  type = "relative",
-  clade = LETTERS[1:10],
-  threshold = 1000,
-  drop_samples = NULL,
-  drop_seqs = NULL,
-  silent = TRUE
+  metadata = NULL,
+  type = "absolute",
+  factors = NULL,
+  onlyprofile = FALSE,
+  names = FALSE,
+  arrange = TRUE,
+  seed = NULL,
+  silent = TRUE,
+  ...
 )
 }
 \arguments{
 \item{folder}{location of the root Symportal output}
 
+\item{metadata}{location of a metadata file in csv, must contain a column called sample_name with matches}
+
 \item{type}{returns either "relative" or "absolute"}
 
-\item{clade}{filter by single "C" or multiple clades c("C", "D") to filter sequences by}
+\item{factors}{option to include a vector list of column names, e.g: c("location", "latitude") to not import every column in a metadata file, if left NULL then will import all columns}
 
-\item{threshold}{Set threshold to remove samples if less than the threshold (defaults to 1000)}
+\item{onlyprofile}{TRUE/FALSE return only profiles}
 
-\item{drop_samples}{drop samples by named vector, e.g. c("H00B07", "H00B06"), or by one or more partial matches, e.g. c("07","B06")}
+\item{names}{print names list, FALSE by default}
 
-\item{drop_seqs}{drop seqs by named vector, e.g. c("X2777817_G", "X2777816_G"), or by one or more partial matches, e.g. c("X2","OT")}
+\item{arrange}{arrange by seq_ID alphanumerically, TRUE by default}
 
-\item{silent}{defaults to TRUE, if FALSE then prints a list of removed sample names}
+\item{silent}{print summary statistics, FALSE by default}
 }
 \value{
-A data.frame of seq.ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
+A data.frame of seq_ID (columns) and sample_name (rows) with either relative or absolute abundance of sequences.
 }
 \description{
-Function to extract sequences from symportal output
+extract sequences from symportal output
 }

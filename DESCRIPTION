@@ -1,19 +1,13 @@
-Package: symportalfunctions
-Title: Collection of Functions to Extract Data from Symportal
-Version: 0.3.11
+Package: symbioR
+Title: symbioR
+Version: 0.0.0.9006
 Authors@R: 
-    person("George", "Roff", , "George.Roff@csiro.au", role = c("aut", "cre"))
-Description: Collection of functions to extract data from Symportal.
-License: GPL (>= 3)
+    person("Eugenia", "Sampayo", , "eugeniadesampayo@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: a toolkit of functions to tidy and visualise ITS2 sequence profiles for Symbiodiniaceae.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-URL: https://marine-ecologist.github.io/symportalfunctions/
-Suggests: 
-    knitr,
-    rmarkdown,
-    testthat (>= 3.0.0)
-Imports:
+Imports: 
     magrittr
-VignetteBuilder: knitr
-Config/testthat/edition: 3

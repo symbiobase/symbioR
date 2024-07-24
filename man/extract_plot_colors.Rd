@@ -10,8 +10,8 @@ extract_plot_colors(folder)
 \item{folder}{location of the root Symportal output}
 }
 \value{
-its_profile A data.frame of ITS profiles for each sample.ID
+list of colors for plotting
 }
 \description{
-Function to extract colors for plots from Symportal
+internal function
 }

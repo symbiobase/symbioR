@@ -1,14 +1,10 @@
 ---
-title: "tidyseqs"
-date: "`r Sys.Date()`"
+title: "index"
+date: "2023-10-23"
 ---
 
-
-### Installation
-
-`tidyseqs` can be installed on github via `remotes`:
-
-```{r class.source = 'fold-show', eval=FALSE, include=TRUE}
-#install.packages("remotes")
-remotes::install_github("marine-ecologist/tidyseqs")
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 ```
+
+# index

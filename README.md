@@ -1,5 +1,17 @@
-# symportalfunctions
-Tools to extract and visualise data from Symportal
+# symbioR
+
+a toolkit of functions to tidy and visualise ITS2 sequence profiles from a range of sources including the [Symportal](https://symportal.org) platform
 
 
-![my_plot](https://github.com/marine-ecologist/symportalfunctions/assets/93563980/7f5a578a-428e-4a7a-a007-ea7f2772ee63)
+## Installation
+
+the current development version of `tidyseqs` can be installed from github:
+
+``` r
+#install.packages("remotes")
+remotes::install_github("marine-ecologist/tidyseqs", force=TRUE)
+
+```
+
+
+<img width="1248" alt="Screenshot 2023-10-11 at 7 45 23 am" src="https://github.com/marine-ecologist/tidyseqs/assets/93563980/1d7cbf0e-4804-4257-97b2-dc09d00a399a">
