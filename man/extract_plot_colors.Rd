@@ -4,7 +4,7 @@
 \alias{extract_plot_colors}
 \title{Function to extract colors for plots from Symportal}
 \usage{
-extract_plot_colors(folder)
+extract_plot_colors(folder, ...)
 }
 \arguments{
 \item{folder}{location of the root Symportal output}

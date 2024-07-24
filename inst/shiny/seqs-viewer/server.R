@@ -1,4 +1,4 @@
-library(symportalfunctions)
+library(symbioR)
 library(tidyverse)
 library(ggplot2)
 library(ggridges)
