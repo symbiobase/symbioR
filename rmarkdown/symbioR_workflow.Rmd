@@ -28,8 +28,7 @@ set.seed(1)
 folder_path <- ("/Users/rof011/symbiodinium/20230120T102936_esampayo")
 
 ```
-
-
+use
 
 ## 1. extract sequences
 

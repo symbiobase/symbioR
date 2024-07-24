@@ -1,6 +1,6 @@
 Package: symbioR
 Title: symbioR
-Version: 0.0.0.9006
+Version: 0.0.0.9007
 Authors@R: 
     person("Eugenia", "Sampayo", , "eugeniadesampayo@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
