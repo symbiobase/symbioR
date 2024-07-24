@@ -260,7 +260,7 @@ fluidPage(
           textInput("plotHeight", "Height:", value = "6")
         ),
         tags$p("Set output folder:"),
-        textInput("saveFolderInput", "Set folder path:", value = "/Users/rof011/symportalfunctions"),
+        textInput("saveFolderInput", "Set folder path:", value = "/Users/rof011/symbioR"),
         tags$p("Save file or plot data (csv)"),
         actionButton("savePlotBtn", "Save Plot"),
         actionButton("saveDataBtn", "Save Raw Data")

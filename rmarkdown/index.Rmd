@@ -1,5 +1,5 @@
 ---
-title: "index"
+title: "symbioR"
 date: "2023-10-23"
 ---
 
@@ -7,4 +7,14 @@ date: "2023-10-23"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# index
+`symbioR` is a toolkit of functions to tidy and visualise ITS2 sequence profiles for Symbiodiniaceae
+
+![](images/symbioR_viewer-02.png)
+
+to install:
+
+```{r}
+
+remotes::install_github("symbiobase/symbioR")
+
+```
