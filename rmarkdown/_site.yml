@@ -8,6 +8,8 @@ navbar:
   left:
   - text: "Workflow"
     href: symbioR_workflow.html
+  - text: "Visualise"
+    href: symbioR_visualise.html
 
 
 output:

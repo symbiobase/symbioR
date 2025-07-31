@@ -1,8 +1,10 @@
 ---
-title: "symbioR workflow for interactive visualision of Symbodinium sequences"
+title: "Interactive visualision of Symbodinium sequences"
 author: "George Roff"
 date: "2024-07-24"
-output: html_document
+output: 
+  html_document:
+    toc: false
 ---
 
 ```{r setup, include=FALSE}

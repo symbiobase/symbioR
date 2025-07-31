@@ -2,7 +2,7 @@
 
 #' Function to extract sequences from symportal output in long format
 #'
-#' @param input Input data.frame with seq_ID and sample_name
+#' @param input Input data.frame with seq_id and sample_name
 #' @param folder Optional, folder containing profile information
 #' @param type "relative" or "absolute" to specify type of abundance to return
 #' @param drop_samples Vector of samples to exclude by name or pattern
@@ -17,7 +17,7 @@
 #' @param seed Optional, seed value for random sampling
 #' @param silent Print messages
 #' @export
-#' @return A data.frame of seq_ID (columns) and sample.ID (rows) with abundance
+#' @return A data.frame of seq_id (columns) and sample.ID (rows) with abundance
 
 
 filter_seqs <- function(input, folder=NULL, type="relative",
@@ -42,9 +42,9 @@ filter_seqs <- function(input, folder=NULL, type="relative",
 
   # Handle sequence ID filters
   if (!is.null(drop_seqs)) {
-    #input <- dplyr::filter(input, !seq_ID %in% drop_seqs)
+    #input <- dplyr::filter(input, !seq_id %in% drop_seqs)
     input <- input %>% as.data.frame() %>%
-      dplyr::filter(!grepl(paste(drop_seqs, collapse = "|"), seq_ID))
+      dplyr::filter(!grepl(paste(drop_seqs, collapse = "|"), seq_id))
 
     if (!is.null(drop_seqs) & silent==FALSE){
       print(drop_seqs, n=Inf)
@@ -52,9 +52,9 @@ filter_seqs <- function(input, folder=NULL, type="relative",
 
   }
   if (!is.null(keep_seqs)) {
-    #input <- dplyr::filter(input, seq_ID %in% keep_seqs)
+    #input <- dplyr::filter(input, seq_id %in% keep_seqs)
     input <- input %>% as.data.frame() %>%
-      dplyr::filter(!grepl(paste(keep_seqs, collapse = "|"), seq_ID))
+      dplyr::filter(!grepl(paste(keep_seqs, collapse = "|"), seq_id))
 
     if (!is.null(keep_seqs) & silent==FALSE){
       print(keep_seqs, n=Inf)
@@ -67,14 +67,17 @@ filter_seqs <- function(input, folder=NULL, type="relative",
   # Drop profiles
   if (isTRUE(drop_profiles)) {
 
+    tmp <- extract_its2_profile(folder_path)
+    print(head(tmp))
+
     itsprofiles <- extract_its2_profile(folder_path) %>%
-      mutate(seqids = str_split(ITS2.profile.1, pattern = "(?<!\\.)[-/]", n = Inf, simplify = FALSE)) |>
+      mutate(seqids = str_split(ITS2_profile_1, pattern = "(?<!\\.)[-/]", n = Inf, simplify = FALSE)) |>
       pull(seqids) |>
       unlist() |>
       unique()
 
     input <- input %>%
-      dplyr::filter(!seq_ID %in% itsprofiles)
+      dplyr::filter(!seq_id %in% itsprofiles)
 
     if (isTRUE(drop_profiles) & silent==FALSE){
       print(itsprofiles, n=Inf)
@@ -85,14 +88,17 @@ filter_seqs <- function(input, folder=NULL, type="relative",
   # Keep profiles
   if (isTRUE(keep_profiles)) {
 
+    tmp <- extract_its2_profile(folder_path)
+    print(head(tmp))
+
     itsprofiles <- extract_its2_profile(folder_path) %>%
-      mutate(seqids = str_split(ITS2.profile.1, pattern = "(?<!\\.)[-/]", n = Inf, simplify = FALSE)) |>
+      mutate(seqids = str_split(ITS2_profile_1, pattern = "(?<!\\.)[-/]", n = Inf, simplify = FALSE)) |>
       pull(seqids) |>
       unlist() |>
       unique()
 
     input <- input %>%
-      dplyr::filter(seq_ID %in% itsprofiles)
+      dplyr::filter(seq_id %in% itsprofiles)
 
     if (isTRUE(keep_profiles) & silent==FALSE){
       print(itsprofiles, n=Inf)
@@ -119,8 +125,9 @@ filter_seqs <- function(input, folder=NULL, type="relative",
 
   if (!is.null(clade)) {
     input <- input %>%
-      dplyr::filter(grepl(clade, seq_ID)) |>
-      as.data.frame()
+      dplyr::filter(grepl(clade, seq_id)) |>
+      as.data.frame() |>
+      mutate(clade = clade)
   }
 
   #-------- threshold --------#

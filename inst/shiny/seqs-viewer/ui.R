@@ -105,6 +105,13 @@ fluidPage(
         padding: 10px 15px;
       }
       #folderInput {
+        background-color: #C2FEFF;
+        border: 1px solid darkgrey;
+        font-size: 11px;
+        padding: 5px 15px;
+        margin-right: 10px;
+      }
+       #metadataInput {
         background-color: #F2F0CE;
         border: 1px solid darkgrey;
         font-size: 11px;
@@ -132,11 +139,17 @@ fluidPage(
         }
       ")),
       #-------------------- sidebar --------------------------@
-      #-------------------- Specify folder --------------------------@
+      #-------------------- Specify folder and metadata --------------------------@
       div(class="sidebox",
           tags$h3("Select folder:"),
-          tags$p("Select main (root) symportal folder:"),
-          shinyDirButton("folderInput", "Directory", "Please select a directory", FALSE)
+          tags$p("Select main (root) symportal folder and optional metadata file:"),
+          div(
+            shinyDirButton("folderInput", "Directory", "Please select a directory", FALSE,
+                           style = "margin: 4px; "),
+            shinyFilesButton("metadataInput", "Metadata", "Please select a metadata file", FALSE,
+                             style = "margin: 4px; "),
+            style = "width: 100%; text-align: center;",
+          )
       ),
       div(class="sidebox-break"),
       #-------------------- Absolute or relative --------------------------@
@@ -144,9 +157,11 @@ fluidPage(
           tags$h3("Select type:"),
           tags$p("Select relative abundance or absolute abundance for plotting bar graph:"),
           div(
-            actionButton("relativeBtn", "Relative"),
-            actionButton("absoluteBtn", "Absolute"),
-            style = "display: inline-block;"
+            actionButton("relativeBtn", "Relative",
+                         style = "margin: 4px; "),
+            actionButton("absoluteBtn", "Absolute",
+                         style = "margin: 4px; "),
+            style = "width: 100%; text-align: center;",
           )
       ),
       div(class="sidebox-break"),
@@ -163,19 +178,20 @@ fluidPage(
           ),
           div(
             style = "display: inline-block; width: 45%;",
-            actionButton("toggleGrey", "Grey Switch")
+            actionButton("toggleGrey", "Grey Switch", ,
+                         style = "margin-bottom: 4px; margin-left: 6px; ")
           )
       ),
       div(class="sidebox-break"),
       #-------------------- SeqID / SampleID filter --------------------------@
       div(class="sidebox",
           tags$h3("Filter by seqID:"),
-          uiOutput("seqID_ui"),
+          uiOutput("seq_id_ui"),
           tags$p("Include seq.IDs (comma separated):"),
           textInput("seqIDPattern", "", value = ""),
           tags$h3("Filter by Sample:"),
-          uiOutput("sampleID_ui"),
-          tags$p("Exclude sample.IDs (comma seperated)"),
+          uiOutput("sample_id_ui"),
+          tags$p("Exclude sample_IDs (comma seperated)"),
           textInput("excludeSampleIDPatterns", "", value = "")
       ),
       div(class="sidebox-break"),
@@ -243,7 +259,10 @@ fluidPage(
     ),
     mainPanel(
       class = "mainpanel",
-      plotlyOutput("plotUI", width = "1500px", height = "800px")
+      fluidRow(
+        plotlyOutput("plotUI", width = "1500px", height = "800px"),
+        plotOutput("dendrogramPlot", width = "900px", height = "400px")
+      )
     )
   )
 )

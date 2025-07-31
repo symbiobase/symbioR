@@ -11,213 +11,100 @@
 #' @param ncol number of rows to facet
 #' @param seq.order TRUE/FALSE, organise stacked bars by dominant sequences (abundances)
 #' @export
-#' @return A data.frame of seq_ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
+#' @return A data.frame of seq_id (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 
+plot_seqs <- function(input, folder, cols, type = "ggplot", cluster = "none", nrow = NULL,
+                      facet = NULL, seq.order = TRUE, axis = "normal", sort = NULL, ...) {
 
-plot_seqs <- function(input, folder, cols, type = "ggplot", cluster = "none", nrow=NULL, facet = NULL, seq.order=TRUE, ...) {
-
-  #folder=folder_path
-
-  ### update order by dissimilarity index
-
-  if (cluster == "bray-curtis") {
+  if (cluster != "none") {
     dist_data <- input |>
-      dplyr::select(sample_name, seq_ID, abundance) |>
-      tidyr::pivot_wider(names_from = "seq_ID", values_from = "abundance") |>
+      dplyr::select(sample_name, seq_id, abundance) |>
+      tidyr::pivot_wider(names_from = "seq_id", values_from = "abundance") |>
       tibble::column_to_rownames("sample_name") |>
       dplyr::mutate(dplyr::across(dplyr::everything(), ~ ifelse(is.na(.), 0, .)))
 
-    hclust_bray <- hclust(vegan::vegdist(vegan::decostand(dist_data, "total"), "bray"))
-    updated_order_bray <- hclust_bray$order
-    hclust_bray_order <- hclust_bray$labels[updated_order_bray]
+    distance_method <- switch(cluster,
+                              "bray-curtis" = "bray",
+                              "euclidean" = "euclidean",
+                              "jaccard" = "jaccard",
+                              "hellinger" = "hellinger")
+
+    hclust_obj <- hclust(vegan::vegdist(vegan::decostand(dist_data, "total"), distance_method))
+    ordered_samples <- hclust_obj$labels[hclust_obj$order]
 
     input <- input %>%
-      dplyr::mutate(sample_name = factor(sample_name, levels = hclust_bray_order)) %>%
+      dplyr::mutate(sample_name = factor(sample_name, levels = ordered_samples)) %>%
       dplyr::arrange(sample_name)
+  } else {
+
   }
 
-  if (cluster == "euclidean") {
-    dist_data <- input |>
-      dplyr::select(sample_name, seq_ID, abundance) |>
-      tidyr::pivot_wider(names_from = "seq_ID", values_from = "abundance") |>
-      tibble::column_to_rownames("sample_name") |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), ~ ifelse(is.na(.), 0, .)))
-
-    hclust_bray <- hclust(vegan::vegdist(vegan::decostand(dist_data, "total"), "euclidean"))
-    updated_order_bray <- hclust_bray$order
-    hclust_bray_order <- hclust_bray$labels[updated_order_bray]
-
-    input <- input %>%
-      dplyr::mutate(sample_name = factor(sample_name, levels = hclust_bray_order)) %>%
-      dplyr::arrange(sample_name)
-  }
-
-
-  if (cluster == "jaccard") {
-    dist_data <- input |>
-      dplyr::select(sample_name, seq_ID, abundance) |>
-      tidyr::pivot_wider(names_from = "seq_ID", values_from = "abundance") |>
-      tibble::column_to_rownames("sample_name") |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), ~ ifelse(is.na(.), 0, .)))
-
-    hclust_bray <- hclust(vegan::vegdist(vegan::decostand(dist_data, "total"), "jaccard"))
-    updated_order_bray <- hclust_bray$order
-    hclust_bray_order <- hclust_bray$labels[updated_order_bray]
-
-    input <- input %>%
-      dplyr::mutate(sample_name = factor(sample_name, levels = hclust_bray_order)) %>%
-      dplyr::arrange(sample_name)
-  }
-
-
-  if (cluster == "hellinger") {
-    dist_data <- input |>
-      dplyr::select(sample_name, seq_ID, abundance) |>
-      tidyr::pivot_wider(names_from = "seq_ID", values_from = "abundance") |>
-      tibble::column_to_rownames("sample_name") |>
-      dplyr::mutate(dplyr::across(dplyr::everything(), ~ ifelse(is.na(.), 0, .)))
-
-    hclust_bray <- hclust(vegan::vegdist(vegan::decostand(dist_data, "total"), "hellinger"))
-    updated_order_bray <- hclust_bray$order
-    hclust_bray_order <- hclust_bray$labels[updated_order_bray]
-
-    input <- input %>%
-      dplyr::mutate(sample_name = factor(sample_name, levels = hclust_bray_order)) %>%
-      dplyr::arrange(sample_name)
-  }
-
-
-  if (cluster == "none") {
-    input <- input
-  }
-
-  # get colors
+  # Define colors
   colour.seqs_new <- extract_plot_colors(folder)
-  #filtered_color_list <- color_list[names(color_list) %in% input$seq_ID]
 
-  dominant.seqs <-  input %>%
-    group_by(seq_ID) %>%
-    summarize(max_abundance = max(abundance)) %>%
-    arrange(desc(max_abundance)) %>%
-    pull(seq_ID)
+  # Sequence order
+  dominant.seqs <- input %>%
+    dplyr::group_by(seq_id) %>%
+    dplyr::summarize(max_abundance = max(abundance)) %>%
+    dplyr::arrange(desc(max_abundance)) %>%
+    dplyr::pull(seq_id)
 
-  if(seq.order==TRUE){
-    p <-
-      ggplot2::ggplot(
-        data = input,
-        ggplot2::aes(x = sample_name, y = abundance, fill = factor(seq_ID, levels=dominant.seqs), group = factor(seq_ID, levels=dominant.seqs))
-             ) +
-      ggplot2::scale_y_reverse()
-
-
+  # Build ggplot base
+  aes_fill <- if (seq.order) {
+    ggplot2::aes(x = sample_name, y = abundance,
+                 fill = factor(seq_id, levels = dominant.seqs),
+                 group = factor(seq_id, levels = dominant.seqs))
+  } else {
+    ggplot2::aes(x = sample_name, y = abundance, fill = seq_id, group = abundance)
   }
 
-  else if(seq.order==FALSE) {
-  p <-
-    ggplot2::ggplot(
-      data = input,
-      ggplot2::aes(x = sample_name, y = abundance, fill = seq_ID, group = abundance)
-    )
-  }
-
-  p <- p +
-    ggplot2::theme_bw() +
+  p <- ggplot2::ggplot(input, aes_fill) +
     ggplot2::geom_bar(color = "black", linewidth = 0.1, show.legend = FALSE, stat = "identity") +
     ggplot2::scale_fill_manual(values = colour.seqs_new) +
+    ggplot2::theme_bw() +
     ggplot2::xlab("") +
     ggplot2::ylab("") +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-    ggplot2::theme(legend.position = "none")
-#
-#
-#   if (!is.null(order)) {
-#
-#     p <-
-#       ggplot2::ggplot(
-#         data = input,
-#         ggplot2::aes(x =  reorder(sample_name, {{order}}), y = abundance, fill = seq_ID, group = abundance)
-#       ) +
-#       ggplot2::theme_bw() +
-#       ggplot2::geom_bar(color = "black", linewidth = 0.1, show.legend = FALSE, stat = "identity") +
-#       ggplot2::scale_fill_manual(values = colour.seqs_new) +
-#       ggplot2::xlab("") +
-#       ggplot2::ylab("") +
-#       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1))
-#
-#
-#   }
-#
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1),
+      legend.position = "none"
+    )
 
+  #---------------- Axis and Faceting ----------------#
 
-  #--------------------------------------------#
-  if (!is.null(nrow)) {
-
-    input <- input
-
-    create_facet_column <- function(df, n) {
-      df %>%
-        dplyr::group_by(sample_name) %>%
-        dplyr::summarise() %>%
-        dplyr::mutate(rn = dplyr::row_number()) %>%
-        #select(-facet_column) %>%
-        dplyr::mutate(facet_column = letters[ceiling(rn / (nrow(.) / n))]) %>%
-        dplyr::right_join(df, by = "sample_name")
-    }
-
-    input <- create_facet_column(input, nrow)
-
-      if(seq.order==TRUE){
-        p <-
-          ggplot2::ggplot(
-            data = input,
-            ggplot2::aes(x = sample_name, y = abundance, fill = factor(seq_ID, levels=dominant.seqs), group = factor(seq_ID, levels=dominant.seqs))
-          ) +
-          ggplot2::scale_y_reverse() +
-          ggplot2::theme(legend.position = "none")
-
-
-      }
-
-    else if(seq.order==FALSE) {
-      p <-
-        ggplot2::ggplot(
-          data = input,
-          ggplot2::aes(x = sample_name, y = abundance, fill = seq_ID, group = abundance)
-        )
-    }
-
-    p <- p +
-      ggplot2::theme_bw() +
-      ggplot2::geom_bar(color = "black", linewidth = 0.1, show.legend = FALSE, stat = "identity") +
-      ggplot2::scale_fill_manual(values = colour.seqs_new) +
-      ggplot2::xlab("") +
-      ggplot2::ylab("") +
-      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-      ggplot2::facet_wrap(~ facet_column, nrow=nrow, scales = "free_x") +
-      ggplot2::theme(panel.spacing = unit(2, "cm", data = NULL)) +
-      ggplot2::theme(legend.position = "none")
-    }
-
-
-  #--------------------------------------------#
-  if (!is.null(facet)) {
-    p <- p +
-      ggplot2::facet_wrap(~ get(facet), scales = "free_x") + ggplot2::xlab("") + ggplot2::theme(legend.position = "none")
+  if (!is.null(facet) && facet %in% names(input)) {
+    facet_formula <- as.formula(paste("~", facet))
+  } else if (!is.null(facet)) {
+    stop(paste("Facet variable", facet, "not found in input"))
+  } else {
+    facet_formula <- NULL
   }
-  #--------------------------------------------#
 
+  # Apply facet and axis direction
+  if (axis == "flipped") {
+    if (!is.null(facet_formula)) {
+      p <- p +
+        ggplot2::facet_wrap(facet_formula, nrow = nrow, scales = "free_y") +
+        ggplot2::theme(panel.spacing = ggplot2::unit(2, "cm"))
+    }
+    p <- p + ggplot2::coord_flip()
+  } else if (axis == "normal") {
+    if (!is.null(facet_formula)) {
+      p <- p +
+        ggplot2::facet_wrap(facet_formula, nrow = nrow, scales = "free_x") +
+        ggplot2::theme(panel.spacing = ggplot2::unit(2, "cm"))
+    }
+  }
+
+  #---------------- Output ----------------#
 
   if (type == "ggplot") {
-
     return(p)
-
   } else if (type == "plotly") {
-
-    p <- plotly::ggplotly(p) %>% plotly::layout(height = p$plotHeight, autosize=TRUE, margin = list(l = 100, r = 100))
-
-    return(p)
-
+    return(plotly::ggplotly(p) %>%
+             plotly::layout(height = p$plotHeight, autosize = TRUE,
+                            margin = list(l = 100, r = 100)))
   } else {
-    print("either one of ggplot or plotly")
+    stop("type must be 'ggplot' or 'plotly'")
   }
+
 }
