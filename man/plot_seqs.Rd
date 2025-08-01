@@ -13,6 +13,8 @@ plot_seqs(
   nrow = NULL,
   facet = NULL,
   seq.order = TRUE,
+  axis = "normal",
+  sort = NULL,
   ...
 )
 }
@@ -30,7 +32,7 @@ plot_seqs(
 \item{ncol}{number of rows to facet}
 }
 \value{
-A data.frame of seq_ID (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
+A data.frame of seq_id (columns) and sample.ID (rows) with either relative or absolute abundance of sequences.
 }
 \description{
 quick visualisation of sequences clustered by sample name either with ggplot or plotly with

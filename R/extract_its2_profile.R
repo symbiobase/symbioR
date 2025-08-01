@@ -1,6 +1,8 @@
 #' Function to extract its2 profiles from Symportal
 #'
-#'.
+#' type = "relative" sources "profiles.relative.abund_and_meta.txt"
+#' type = "absolute" sources  "profiles.absolute.abund_and_meta.txt"
+#'
 #'
 #' @param folder location of the root Symportal output
 #' @param type relative or absolute

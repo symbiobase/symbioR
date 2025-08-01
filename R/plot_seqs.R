@@ -35,10 +35,7 @@ plot_seqs <- function(input, folder, cols, type = "ggplot", cluster = "none", nr
     input <- input %>%
       dplyr::mutate(sample_name = factor(sample_name, levels = ordered_samples)) %>%
       dplyr::arrange(sample_name)
-  } else {
-
   }
-
   # Define colors
   colour.seqs_new <- extract_plot_colors(folder)
 

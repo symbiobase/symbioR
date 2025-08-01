@@ -22,7 +22,7 @@ filter_seqs(
 )
 }
 \arguments{
-\item{input}{Input data.frame with seq_ID and sample_name}
+\item{input}{Input data.frame with seq_id and sample_name}
 
 \item{folder}{Optional, folder containing profile information}
 
@@ -51,7 +51,7 @@ filter_seqs(
 \item{seed}{Optional, seed value for random sampling}
 }
 \value{
-A data.frame of seq_ID (columns) and sample.ID (rows) with abundance
+A data.frame of seq_id (columns) and sample.ID (rows) with abundance
 }
 \description{
 Function to extract sequences from symportal output in long format

@@ -13,6 +13,7 @@ extract_seqs(
   names = FALSE,
   arrange = TRUE,
   seed = NULL,
+  janitor = FALSE,
   silent = TRUE,
   ...
 )
@@ -30,12 +31,14 @@ extract_seqs(
 
 \item{names}{print names list, FALSE by default}
 
-\item{arrange}{arrange by seq_ID alphanumerically, TRUE by default}
+\item{arrange}{arrange by seq_id alphanumerically, TRUE by default}
+
+\item{janitor}{FALSE by default, set to TRUE to use janitor clean_names on inputs}
 
 \item{silent}{print summary statistics, FALSE by default}
 }
 \value{
-A data.frame of seq_ID (columns) and sample_name (rows) with either relative or absolute abundance of sequences.
+A data.frame of seq_id (columns) and sample_name (rows) with either relative or absolute abundance of sequences.
 }
 \description{
 extract sequences from symportal output

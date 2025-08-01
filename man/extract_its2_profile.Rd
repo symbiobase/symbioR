@@ -15,5 +15,6 @@ extract_its2_profile(folder, type = "absolute")
 its_profile A data.frame of ITS profiles for each sample_name
 }
 \description{
-.
+type = "relative" sources "profiles.relative.abund_and_meta.txt"
+type = "absolute" sources  "profiles.absolute.abund_and_meta.txt"
 }
